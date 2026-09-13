@@ -1,0 +1,16 @@
+{
+  "_comment": "策展配置：快照抓取脚本的全部可调项都在这里，脚本内不硬编码任何仓库名。字段说明见 doc/collaboration/results/task-004-dev-r1.md。",
+  "owner": "APpery1",
+  "exclude": [],
+  "excludeForks": true,
+  "pinned": [],
+  "showMeta": true,
+  "repoBaseUrl": "https://github.com",
+  "apiBaseUrl": "https://api.github.com",
+  "_decisions": {
+    "exclude": "用户明确要求五个公开仓库全部展示，故为空数组。筛选机制本身仍然实现且可配置（FR-04）；要隐藏某仓库，把它的名字加进本数组即可，无需改脚本。",
+    "pinned": "为空表示完全按 pushedAt 降序（名称升序决胜）。把仓库名按期望顺序填进来即可置顶。",
+    "excludeForks": "账号当前无 fork 仓库，开启仅为防止将来 fork 的项目混进作品区。",
+    "showMeta": "是否在快照里上报 language / stars。false 时这两项退化为 null / 0（pushedAt 必须保留，它是排序键）。渲染层是否展示元信息由 task-003 决定。"
+  }
+}

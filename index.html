@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="APpery（姜博溪）的个人网站：正在学习成长的 coder，长江大学在读。">
+  <meta name="author" content="姜博溪 (APpery)">
+  <title>APpery · 姜博溪 | 正在学习成长的 coder</title>
+  <!--
+    根路径部署（https://appery1.github.io），资源使用绝对路径，无 base path 问题。
+    文案约定：所有可见文案挂在 data-i18n 键位上，同时把中文文案直接写在元素内，
+    使页面在 JS 缺失或词典加载失败时仍可读。切换逻辑属 task-002，本文件只预留 DOM。
+  -->
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="a11y.skipToContent">跳到主要内容</a>
+
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <!-- 专有名词，双语一致，不做 i18n -->
+      <a class="topbar__brand" href="#about">APpery</a>
+
+      <nav class="topbar__nav" aria-label="主要导航">
+        <a href="#about" data-i18n="nav.about">关于我</a>
+        <a href="#projects" data-i18n="nav.projects">项目</a>
+        <a href="#contact" data-i18n="nav.contact">联系</a>
+      </nav>
+
+      <!-- 语言切换：本任务仅 DOM + 样式占位，行为由 task-002 接管 -->
+      <button class="lang-toggle" id="lang-toggle" type="button" aria-label="切换语言 / Switch language">
+        <span data-i18n="nav.langToggle">English</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="about" class="section hero" aria-labelledby="hero-title">
+      <div class="container">
+        <p class="hero__eyebrow" data-i18n="hero.greeting">你好，我是</p>
+
+        <h1 class="hero__title" id="hero-title">
+          <span class="hero__nick" data-i18n="about.nickname">APpery</span>
+          <span class="hero__real" data-i18n="about.realName">姜博溪</span>
+        </h1>
+
+        <p class="hero__tagline" data-i18n="hero.tagline">正在学习成长的 coder</p>
+
+        <p class="hero__bio" data-i18n="about.bio">我是姜博溪，长江大学在读学生，网名 APpery。目前主要用 Python 和 TypeScript 写东西，靠一个个小项目把基础打牢——从桌面小工具到全栈小应用，边做边学。这个站点本身也是其中一次练习。</p>
+
+        <ul class="hero__facts">
+          <li class="fact">
+            <span class="fact__label" data-i18n="about.schoolLabel">就读院校</span>
+            <span class="fact__value" data-i18n="about.school">长江大学</span>
+          </li>
+          <li class="fact">
+            <span class="fact__label" data-i18n="about.roleLabel">自我定位</span>
+            <span class="fact__value" data-i18n="about.role">正在学习成长的 coder</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="projects" class="section" aria-labelledby="projects-title">
+      <div class="container">
+        <h2 class="section__title" id="projects-title" data-i18n="projects.title">项目</h2>
+        <p class="section__lead" data-i18n="projects.lead">下面这些项目与我的 GitHub 公开仓库保持同步，由构建流程定期更新。</p>
+
+        <!--
+          项目卡片由 task-003 的 JS 渲染进 #project-grid。
+          本任务只提供容器与空态骨架，不写死任何仓库名。
+          无 JS 时 #projects-empty 保持可见，即是 FR-11 要求的降级提示。
+        -->
+        <div class="project-grid" id="project-grid"></div>
+        <p class="empty-state" id="projects-empty" data-i18n="projects.empty">项目列表暂时不可用。可以稍后再来，或直接访问我的 GitHub 主页查看全部仓库。</p>
+      </div>
+    </section>
+
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <div class="container">
+        <h2 class="section__title" id="contact-title" data-i18n="contact.title">联系我</h2>
+        <p class="section__lead" data-i18n="contact.lead">欢迎通过以下任意一种方式找到我。</p>
+
+        <ul class="contact-list">
+          <li class="contact-item">
+            <span class="contact-item__label" data-i18n="contact.emailLabel">邮箱</span>
+            <a class="contact-item__value" href="mailto:appery003@gmail.com">appery003@gmail.com</a>
+          </li>
+          <li class="contact-item">
+            <span class="contact-item__label" data-i18n="contact.qqLabel">QQ</span>
+            <span class="contact-item__value">2465787629</span>
+          </li>
+          <li class="contact-item">
+            <span class="contact-item__label" data-i18n="contact.wechatLabel">微信</span>
+            <span class="contact-item__value">thissappery</span>
+          </li>
+          <li class="contact-item">
+            <span class="contact-item__label" data-i18n="contact.githubLabel">GitHub</span>
+            <a class="contact-item__value" href="https://github.com/APpery1" target="_blank" rel="noopener noreferrer">github.com/APpery1</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p data-i18n="footer.copyright">© 2026 APpery · 姜博溪</p>
+      <p data-i18n="footer.note">纯静态站点，托管于 GitHub Pages。</p>
+    </div>
+  </footer>
+
+  <!--
+    分阶段状态：以下三个文件在本任务阶段尚不存在，404 是预期的，不是缺陷。
+      /js/i18n.js    → task-002（词典与切换逻辑）
+      /data/repos.js → task-004（快照运行时壳，须先于 main.js 加载）
+      /js/main.js    → task-003（页面行为与空状态降级）
+    defer 保证按文档顺序执行，因此依赖顺序正确。
+  -->
+  <script defer src="/js/i18n-dict.js"></script>
+  <script defer src="/js/i18n.js"></script>
+  <script defer src="/data/repos.js"></script>
+  <script defer src="/js/main.js"></script>
+</body>
+</html>

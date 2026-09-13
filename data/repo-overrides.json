@@ -1,0 +1,6 @@
+{
+  "_note": "描述双语覆盖表。格式：{ \"<仓库名>\": { \"descZh\": \"…\", \"descEn\": \"…\" } }。只有出现在这里的仓库才拿到非空的 descZh/descEn，其余为空字符串（snapshotSchemaContract 规定），渲染层据此回退到 GitHub 原始 description，再回退到 js/i18n-dict.js 里的降级文案。",
+  "_usage": "本文件承载的是**用户撰写的人类真实内容**，不是脚本产出物。目前映射刻意留空：用户尚未提供任何仓库的自定义双语描述，脚本作者不得替用户编造项目内容。留空同时让 APpery1 / MyApplication / test 天然走 fallback 分支，task-003 的『描述为空显示占位文案』降级验收因此在真实数据上可验证，而不是只能靠 fixture。",
+  "_howToFill": "用户给出真实描述后，按上面的格式新增条目即可，无需改动任何脚本或重新配置其它文件；改完重跑 node scripts/fetch-repos.mjs 即可生效。若只想覆盖中文、保留 GitHub 原文作英文，只写 descZh 也可（descEn 缺省为空字符串）。",
+  "_doNotDo": "不要为了『卡片好看』而在此填入推测性内容——那会让真实描述与占位描述在文件里无法区分。降级文案属于 UI 词条，集中在 js/i18n-dict.js，不在此处重复一份。"
+}

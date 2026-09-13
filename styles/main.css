@@ -1,0 +1,527 @@
+/* ============================================================================
+   APpery 个人网站 · 主样式表
+   ----------------------------------------------------------------------------
+   组织顺序：
+     1. 设计令牌（深色为默认）
+     2. 亮色主题覆盖（跟随系统）
+     3. 基础重置与排版
+     4. 可访问性辅助
+     5. 布局容器与区块
+     6. 组件（顶栏 / 首屏 / 卡片 / 联系方式 / 页脚）
+     7. 响应式断点
+
+   约定：组件规则内**不得出现颜色字面量**，一律引用自定义属性；
+   换肤只需改第 1、2 节。唯一例外是 `transparent` 关键字——它不是调色板取值，
+   仅用于「暂时不画边框/底色」的占位，不参与主题。
+   ========================================================================= */
+
+/* ---------------------------------------------------------------- 1. 设计令牌 */
+:root {
+  /* 深色为默认主题；color-scheme 让浏览器滚动条/表单控件跟随 */
+  color-scheme: dark;
+
+  --color-bg: #0b1120;
+  --color-surface: #151e31;
+  --color-border: #1e293b;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-accent: #38bdf8;
+
+  /* 强调色的低透明度衬底，用于 hover 态背景 */
+  --color-accent-soft: #38bdf81a;
+  --color-focus: #38bdf8;
+  --color-shadow: #00000080;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: "Cascadia Code", Consolas, monospace;
+
+  --container-max: 960px;
+  --container-pad: 24px;
+  --topbar-height: 64px;
+  --section-space: 96px;
+
+  --radius-card: 12px;
+  --radius-pill: 999px;
+  --card-pad: 20px;
+  --grid-gap: 24px;
+
+  --transition-base: 150ms ease;
+
+  --shadow-card: 0 1px 2px var(--color-shadow);
+}
+
+/* --------------------------------------------------- 2. 亮色主题（跟随系统） */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    --color-bg: #f8fafc;
+    --color-surface: #ffffff;
+    --color-border: #e2e8f0;
+    --color-text: #0f172a;
+    --color-text-muted: #475569;
+    --color-accent: #0369a1;
+
+    --color-accent-soft: #0369a11a;
+    --color-focus: #0369a1;
+    --color-shadow: #0f172a1f;
+  }
+}
+
+/* ------------------------------------------------------------ 3. 重置与排版 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* 粘性顶栏会遮住锚点目标，留出补偿间距 */
+  scroll-padding-top: calc(var(--topbar-height) + 16px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ------------------------------------------------------------ 4. 可访问性 */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: -9999px;
+  z-index: 100;
+  padding: 12px 20px;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 12px;
+  top: 12px;
+}
+
+/* 焦点样式必须始终可见（键盘可达） */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------- 5. 布局与区块 */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
+}
+
+.section {
+  padding-top: var(--section-space);
+  padding-bottom: var(--section-space);
+}
+
+.section__title {
+  font-size: 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+.section__title::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 3px;
+  margin-top: 12px;
+  border-radius: 3px;
+  background-color: var(--color-accent);
+}
+
+.section__lead {
+  max-width: 60ch;
+  margin-top: 16px;
+  margin-bottom: 32px;
+  color: var(--color-text-muted);
+}
+
+/* ---------------------------------------------------------------- 6. 顶栏 */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--topbar-height);
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+}
+
+.topbar__brand {
+  /* 撑开，把导航与语言按钮推到右侧 */
+  margin-right: auto;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.topbar__brand:hover {
+  color: var(--color-accent);
+}
+
+.topbar__nav {
+  display: flex;
+  gap: 20px;
+}
+
+.topbar__nav a {
+  padding: 4px 2px;
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition-base), border-color var(--transition-base);
+}
+
+.topbar__nav a:hover {
+  color: var(--color-text);
+  border-bottom-color: var(--color-accent);
+}
+
+.lang-toggle {
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: color var(--transition-base), border-color var(--transition-base), background-color var(--transition-base);
+}
+
+.lang-toggle:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+}
+
+/* ---------------------------------------------------------------- 首屏 */
+.hero {
+  padding-bottom: calc(var(--section-space) * 0.75);
+}
+
+.hero__eyebrow {
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+}
+
+.hero__title {
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hero__nick {
+  display: block;
+}
+
+.hero__real {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.55em;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.hero__tagline {
+  margin-top: 16px;
+  font-size: 1.125rem;
+  color: var(--color-accent);
+}
+
+.hero__bio {
+  max-width: 60ch;
+  margin-top: 16px;
+  color: var(--color-text-muted);
+}
+
+.hero__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 40px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fact__label {
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.fact__value {
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------- 项目卡片与网格 */
+.project-grid {
+  display: grid;
+  /* 280px 为设计令牌约定值，三档断点下均不产生横向滚动 */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--grid-gap);
+}
+
+.project-grid:not(:empty) + .empty-state {
+  display: none;
+}
+
+/* 以下 .card 系列由 task-003 的 JS 渲染使用，类名为跨任务约定 */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--card-pad);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-card), 0 8px 24px var(--color-shadow);
+  transform: translateY(-2px);
+}
+
+.card__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card__desc {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: auto;
+  padding-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+}
+
+.card__link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.card__link:hover {
+  text-decoration: underline;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 32px var(--card-pad);
+  text-align: center;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+/* ---------------------------------------------------------------- 联系方式 */
+.contact-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-item {
+  padding: var(--card-pad);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  transition: border-color var(--transition-base);
+}
+
+.contact-item:hover {
+  border-color: var(--color-accent);
+}
+
+.contact-item__label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.contact-item__value {
+  font-family: var(--font-mono);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+a.contact-item__value {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a.contact-item__value:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------- 页脚 */
+.footer {
+  padding-top: 32px;
+  padding-bottom: 32px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+
+/* ------------------------------------------------------------ 7. 响应式 */
+@media (max-width: 768px) {
+  :root {
+    --section-space: 64px;
+    --container-pad: 20px;
+  }
+
+  .hero__title {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+
+  .hero__facts {
+    gap: 12px 32px;
+  }
+
+  .topbar__nav {
+    gap: 16px;
+  }
+
+  .section__title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --container-pad: 16px;
+    --topbar-height: 56px;
+  }
+
+  .topbar__inner {
+    gap: 10px;
+  }
+
+  .topbar__brand {
+    font-size: 1rem;
+  }
+
+  .topbar__nav {
+    gap: 10px;
+  }
+
+  .topbar__nav a {
+    font-size: 0.875rem;
+  }
+
+  .lang-toggle {
+    padding: 5px 10px;
+    font-size: 0.8125rem;
+  }
+
+  .hero__tagline {
+    font-size: 1rem;
+  }
+
+  .hero__facts {
+    gap: 12px 24px;
+  }
+
+  .section__lead {
+    margin-bottom: 24px;
+  }
+}
+
+/* 尊重「减少动态效果」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

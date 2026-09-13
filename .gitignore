@@ -1,0 +1,34 @@
+# 依赖
+node_modules/
+
+# 环境变量与密钥（切勿提交）
+.env
+.env.local
+.env.*.local
+
+# 操作系统产物
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 临时文件
+*.tmp
+*.bak
+
+# 内部协作与流程文档（用户决策 2026-09-13：不公开）
+# doc/  ：需求 / 计划 / 开发规范 / 经验库 / 任务状态 / Agent 信封与报告 / 回滚备份
+# logs/ ：编排日志与 Agent 日志
+# .claude/ ：本地权限配置（settings.local.json）与 Agent 记忆
+# ★ 这三者被忽略是**用户明确决策**，不是产物清理。
+# ★ 不忽略的对照：data/repos.json 虽属产物但**必须提交**（见下），站点文件一律提交。
+doc/
+logs/
+.claude/
+
+# 注意：data/repos.json（项目快照）属产物，但必须提交
+# —— GitHub Actions 定时重建后需要 diff 可见，故不忽略。
