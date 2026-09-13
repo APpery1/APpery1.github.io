@@ -19,7 +19,7 @@
   var DICT = {
     zh: {
       // —— 页面级 ——
-      'page.title': 'APpery · 姜博溪 | 正在学习成长的 coder',
+      'page.title': 'APpery1',
 
       // —— 无障碍 ——
       'a11y.skipToContent': '跳到主要内容',
@@ -68,7 +68,7 @@
 
     en: {
       // —— 页面级 ——
-      'page.title': 'APpery · Jiang Boxi | A coder learning and growing',
+      'page.title': 'APpery1',
 
       // —— 无障碍 ——
       'a11y.skipToContent': 'Skip to main content',
