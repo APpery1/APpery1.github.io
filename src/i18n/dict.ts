@@ -33,6 +33,7 @@ const zh = {
   'card.open': '打开',
   'panel.back': '返回卡片',
   'panel.close': '关闭',
+  'page.backToWork': '返回工作',
 
   'projects.kicker': '01',
   'projects.title': '项目',
@@ -60,6 +61,9 @@ const zh = {
   'album.lead': '一些自己拍的风景。',
   'album.empty': '还没有放上来。照片整理好之后会陆续出现在这里。',
   'album.count': '张',
+  'album.lightbox': '查看原图',
+  'album.prev': '上一张',
+  'album.next': '下一张',
 
   'contact.kicker': '03',
   'contact.title': '联系',
@@ -114,6 +118,7 @@ const en: Record<MessageKey, string> = {
   'card.open': 'Open',
   'panel.back': 'Back to cards',
   'panel.close': 'Close',
+  'page.backToWork': 'Back to work',
 
   'projects.kicker': '01',
   'projects.title': 'Projects',
@@ -142,6 +147,9 @@ const en: Record<MessageKey, string> = {
   'album.lead': 'A few landscapes of my own.',
   'album.empty': 'Nothing here yet. Photos will appear once they are sorted.',
   'album.count': 'photos',
+  'album.lightbox': 'View original',
+  'album.prev': 'Previous photo',
+  'album.next': 'Next photo',
 
   'contact.kicker': '03',
   'contact.title': 'Contact',

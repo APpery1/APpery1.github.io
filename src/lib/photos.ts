@@ -1,39 +1,41 @@
 /*
- * 相册清单来自 data/photos.json。
- * 加照片两步：
- *   1. 把图片放到 public/assets/photos/（例如 public/assets/photos/2026-lake.jpg）
- *   2. 在 data/photos.json 加一项：
- *      { "src": "/assets/photos/2026-lake.jpg", "alt": "湖边的清晨" }
- * src 必须以 /assets/photos/ 开头，alt 不能为空，否则该条会被跳过。
+ * 把照片放进项目根目录的 photo/ 文件夹即可。
+ * 支持 jpg / jpeg / png / webp / gif。保存后刷新页面，相册会自动读取。
+ * 墙面用压缩缩略图，点开再加载较大的预览图。
  */
-import photosJson from '../../data/photos.json'
 import type { Photo } from '../types'
 
-const SRC_PREFIX = '/assets/photos/'
-const photos = photosJson as Photo[]
+const thumbs = import.meta.glob('../../photo/.thumbs/*.{jpg,jpeg,webp,JPG,JPEG,WEBP}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
 
-function isPhoto(value: unknown): value is Photo {
-  if (!value || typeof value !== 'object') {
-    return false
-  }
-  const item = value as Partial<Photo>
-  return typeof item.src === 'string' && typeof item.alt === 'string'
+const fulls = import.meta.glob('../../photo/.full/*.{jpg,jpeg,webp,JPG,JPEG,WEBP}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>
+
+function stemFromPath(filePath: string): string {
+  const file = filePath.split('/').pop() ?? filePath
+  return file.replace(/\.[^.]+$/, '')
 }
 
+function mapByStem(modules: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(modules).map(([filePath, url]) => [stemFromPath(filePath), url]))
+}
+
+const thumbByStem = mapByStem(thumbs)
+const fullByStem = mapByStem(fulls)
+
 export function getPhotos(): Photo[] {
-  if (!Array.isArray(photos)) {
-    return []
-  }
-  return photos.filter((item) => {
-    if (!isPhoto(item)) {
-      return false
-    }
-    if (!item.src.startsWith(SRC_PREFIX)) {
-      return false
-    }
-    if (item.alt.trim() === '') {
-      return false
-    }
-    return true
-  })
+  return Object.keys(thumbByStem)
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((stem) => ({
+      src: fullByStem[stem] ?? thumbByStem[stem],
+      thumb: thumbByStem[stem],
+      alt: stem,
+    }))
+    .filter((item) => item.thumb && item.src && item.alt.trim() !== '')
 }

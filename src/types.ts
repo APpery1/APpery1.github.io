@@ -18,6 +18,7 @@ export type Snapshot = {
 
 export type Photo = {
   src: string
+  thumb: string
   alt: string
 }
 
@@ -28,5 +29,6 @@ export type Doc = {
   date?: string
 }
 
-export type PanelId = 'projects' | 'research' | 'docs' | 'album'
-export type PageId = 'about' | 'work' | 'contact'
+export type PanelId = 'projects' | 'research'
+export type HubPageId = 'about' | 'work' | 'contact'
+export type PageId = HubPageId | 'docs' | 'album'

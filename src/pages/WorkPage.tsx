@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { AlbumGrid } from '../components/AlbumGrid'
-import { DocList } from '../components/DocList'
 import { ProjectList } from '../components/ProjectList'
 import type { MessageKey } from '../i18n/dict'
 import { useI18n } from '../i18n/LanguageContext'
@@ -9,18 +7,21 @@ import { getPhotos } from '../lib/photos'
 import { getRepos } from '../lib/repos'
 import type { PanelId } from '../types'
 
+type CardId = PanelId | 'docs' | 'album'
+
 type Card = {
-  id: PanelId
+  id: CardId
   kicker: MessageKey
   title: MessageKey
   lead: MessageKey
+  href?: '#docs' | '#album'
 }
 
 const CARDS: Card[] = [
   { id: 'projects', kicker: 'projects.kicker', title: 'projects.title', lead: 'projects.lead' },
   { id: 'research', kicker: 'skills.kicker', title: 'skills.title', lead: 'skills.lead' },
-  { id: 'docs', kicker: 'docs.kicker', title: 'docs.title', lead: 'docs.lead' },
-  { id: 'album', kicker: 'album.kicker', title: 'album.title', lead: 'album.lead' },
+  { id: 'docs', href: '#docs', kicker: 'docs.kicker', title: 'docs.title', lead: 'docs.lead' },
+  { id: 'album', href: '#album', kicker: 'album.kicker', title: 'album.title', lead: 'album.lead' },
 ]
 
 type Props = {
@@ -63,7 +64,7 @@ export function WorkPage({ panel, onOpen, onClose }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [panel, onClose])
 
-  const previews: Record<PanelId, string> = {
+  const previews: Record<CardId, string> = {
     projects:
       repos.length > 0
         ? `${repos.length} ${t('projects.count')} · ${repos
@@ -110,26 +111,17 @@ export function WorkPage({ panel, onOpen, onClose }: Props) {
         <ul className="work-grid">
           {CARDS.map((card) => (
             <li key={card.id}>
-              <button
-                type="button"
-                className="work-card cursor-target"
-                onClick={() => onOpen(card.id)}
-              >
-                <span className="work-card__kicker">{t(card.kicker)}</span>
-                <span className="work-card__title">{t(card.title)}</span>
-                <span className="work-card__lead">{t(card.lead)}</span>
-                <span className="work-card__preview">{previews[card.id]}</span>
-                <span className="work-card__open">
-                  {t('card.open')}
-                  <span aria-hidden="true"> →</span>
-                </span>
-              </button>
+              <WorkCard
+                card={card}
+                preview={previews[card.id]}
+                onOpen={onOpen}
+              />
             </li>
           ))}
         </ul>
       </div>
 
-      {active ? (
+      {active && (active.id === 'projects' || active.id === 'research') ? (
         <div className="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
           <div className="panel__bar container">
             <button ref={closeRef} type="button" className="panel__back" onClick={onClose}>
@@ -147,7 +139,11 @@ export function WorkPage({ panel, onOpen, onClose }: Props) {
               </h2>
               <p className="panel__lead">{t(active.lead)}</p>
             </header>
-            <PanelContent id={active.id} />
+            {active.id === 'projects' ? (
+              <ProjectList />
+            ) : (
+              <p className="research__body">{t('skills.body')}</p>
+            )}
           </div>
         </div>
       ) : null}
@@ -155,17 +151,44 @@ export function WorkPage({ panel, onOpen, onClose }: Props) {
   )
 }
 
-function PanelContent({ id }: { id: PanelId }) {
+function WorkCard({
+  card,
+  preview,
+  onOpen,
+}: {
+  card: Card
+  preview: string
+  onOpen: (id: PanelId) => void
+}) {
   const { t } = useI18n()
+  const inner = (
+    <>
+      <span className="work-card__kicker">{t(card.kicker)}</span>
+      <span className="work-card__title">{t(card.title)}</span>
+      <span className="work-card__lead">{t(card.lead)}</span>
+      <span className="work-card__preview">{preview}</span>
+      <span className="work-card__open">
+        {t('card.open')}
+        <span aria-hidden="true"> →</span>
+      </span>
+    </>
+  )
 
-  if (id === 'projects') {
-    return <ProjectList />
+  if (card.href) {
+    return (
+      <a className="work-card cursor-target" href={card.href}>
+        {inner}
+      </a>
+    )
   }
-  if (id === 'research') {
-    return <p className="research__body">{t('skills.body')}</p>
-  }
-  if (id === 'docs') {
-    return <DocList />
-  }
-  return <AlbumGrid />
+
+  return (
+    <button
+      type="button"
+      className="work-card cursor-target"
+      onClick={() => onOpen(card.id as PanelId)}
+    >
+      {inner}
+    </button>
+  )
 }

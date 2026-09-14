@@ -80,6 +80,12 @@ body::before {
   z-index: 1;
 }
 
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .site-background {
   position: fixed;
   z-index: 0;
@@ -185,6 +191,21 @@ ul {
   font-weight: 650;
   letter-spacing: -0.03em;
   flex: 0 0 auto;
+}
+
+.topbar__back {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-left: -8px;
+  color: var(--text);
+  flex: 0 0 auto;
+  border-radius: 8px;
+}
+
+.topbar__back:hover {
+  color: var(--accent);
 }
 
 .topbar__nav {
@@ -663,8 +684,15 @@ ul {
   margin-bottom: 8px;
 }
 
+.subpage-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .panel__back,
-.panel__close {
+.panel__close,
+.subpage-back {
   color: var(--muted);
   font-size: 0.92rem;
 }
@@ -676,8 +704,47 @@ ul {
 }
 
 .panel__back:hover,
-.panel__close:hover {
+.panel__close:hover,
+.subpage-back:hover {
   color: var(--accent);
+}
+
+.page--album {
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.page--album .album-wall {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.page--docs .page__body {
+  overflow: auto;
+}
+
+.subpage-head {
+  margin-bottom: 16px;
+  max-width: 40rem;
+}
+
+.subpage-head__title {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  letter-spacing: -0.03em;
+}
+
+.subpage-head__lead {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.album-wall {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  width: 100%;
 }
 
 .panel__body {
@@ -972,6 +1039,63 @@ a.doc__link:hover {
     grid-column: 2;
     justify-self: start;
   }
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 48px 72px;
+  background: rgb(0 0 0 / 88%);
+  cursor: zoom-out;
+}
+
+.lightbox__img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: default;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 50%);
+}
+
+.lightbox__close,
+.lightbox__nav {
+  position: absolute;
+  color: #f1eee6;
+  line-height: 1;
+}
+
+.lightbox__close {
+  top: 14px;
+  right: 18px;
+  font-size: 2rem;
+  width: 44px;
+  height: 44px;
+}
+
+.lightbox__nav {
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2.6rem;
+  width: 48px;
+  height: 48px;
+}
+
+.lightbox__nav--prev {
+  left: 12px;
+}
+
+.lightbox__nav--next {
+  right: 12px;
+}
+
+.lightbox__close:hover,
+.lightbox__nav:hover {
+  color: var(--accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

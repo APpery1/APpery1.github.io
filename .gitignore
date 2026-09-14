@@ -24,6 +24,10 @@ desktop.ini
 *.tmp
 *.bak
 
+# 相册派生图（构建时由 scripts/prepare-photos.mjs 生成）
+photo/.thumbs/
+photo/.full/
+
 # 内部协作与流程文档（用户决策 2026-09-13：不公开）
 # doc/  ：需求 / 计划 / 开发规范 / 经验库 / 任务状态 / Agent 信封与报告 / 回滚备份
 # logs/ ：编排日志与 Agent 日志

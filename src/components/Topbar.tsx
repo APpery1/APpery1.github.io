@@ -1,5 +1,6 @@
 import { site } from '../content/site'
 import { useI18n } from '../i18n/LanguageContext'
+import type { PageId } from '../types'
 
 const NAV = [
   { href: '#about', key: 'nav.about' },
@@ -7,15 +8,34 @@ const NAV = [
   { href: '#contact', key: 'nav.contact' },
 ] as const
 
-export function Topbar() {
+type Props = {
+  page: PageId
+}
+
+export function Topbar({ page }: Props) {
   const { t } = useI18n()
+  const showBack = page === 'album' || page === 'docs'
 
   return (
     <header className="topbar">
       <div className="container topbar__inner">
-        <a className="topbar__brand" href="#about">
-          {site.nickname}
-        </a>
+        {showBack ? (
+          <a className="topbar__back" href="#work" aria-label={t('page.backToWork')}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+        ) : (
+          <a className="topbar__brand" href="#about">
+            {site.nickname}
+          </a>
+        )}
         <nav className="topbar__nav" aria-label={t('a11y.navLabel')}>
           {NAV.map((item) => (
             <a key={item.href} href={item.href}>

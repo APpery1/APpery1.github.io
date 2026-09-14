@@ -1,15 +1,15 @@
 import type { MessageKey } from '../i18n/dict'
 import { useI18n } from '../i18n/LanguageContext'
-import type { PageId } from '../types'
+import type { HubPageId } from '../types'
 
-const DOTS: { id: PageId; label: MessageKey }[] = [
+const DOTS: { id: HubPageId; label: MessageKey }[] = [
   { id: 'about', label: 'nav.about' },
   { id: 'work', label: 'nav.work' },
   { id: 'contact', label: 'nav.contact' },
 ]
 
 type Props = {
-  active: PageId
+  active: HubPageId
 }
 
 export function Pager({ active }: Props) {

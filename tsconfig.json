@@ -18,5 +18,5 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "include": ["src", "data/repos.json", "data/photos.json", "data/docs.json"]
+  "include": ["src", "data/repos.json"]
 }
