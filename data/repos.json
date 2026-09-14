@@ -1,7 +1,18 @@
 {
-  "generatedAt": "2026-09-13T10:48:48.650Z",
+  "generatedAt": "2026-09-14T09:08:05.039Z",
   "owner": "APpery1",
   "repos": [
+    {
+      "name": "APpery1.github.io",
+      "url": "https://github.com/APpery1/APpery1.github.io",
+      "description": "APpery（姜博溪）的个人网站 · 纯静态，项目列表与 GitHub 同步",
+      "descZh": "",
+      "descEn": "",
+      "language": "JavaScript",
+      "pushedAt": "2026-09-14T09:07:49Z",
+      "stars": 0,
+      "fork": false
+    },
     {
       "name": "APpery1",
       "url": "https://github.com/APpery1/APpery1",
