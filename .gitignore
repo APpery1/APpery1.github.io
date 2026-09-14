@@ -1,6 +1,10 @@
 # 依赖
 node_modules/
 
+# 构建产物
+dist/
+*.tsbuildinfo
+
 # 环境变量与密钥（切勿提交）
 .env
 .env.local

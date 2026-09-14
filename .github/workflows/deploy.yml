@@ -1,0 +1,78 @@
+# APpery1.github.io · 重建仓库快照并部署 Vite/React 静态站
+#
+# ① node scripts/fetch-repos.mjs  → data/repos.json（构建期快照）
+# ② npm ci && npm run build      → dist/
+# ③ 提交快照回仓库，再把 dist/ 发布到 GitHub Pages
+#
+# 纯静态产出：无 SSR、无运行时 GitHub API。页面把 repos.json 打进 bundle。
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # UTC 21:30 = 北京时间次日 05:30
+    - cron: '30 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: 抓取 GitHub 仓库快照
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/fetch-repos.mjs
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: 提交快照回仓库
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/repos.json data/repos.js
+          if git diff --cached --quiet; then
+            echo "快照无变化，无需提交"
+            exit 0
+          fi
+          git commit -m "chore(snapshot): 定时刷新 GitHub 仓库快照 [skip ci]"
+          git push
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
