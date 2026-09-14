@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-14T11:03:38.549Z",
+  "generatedAt": "2026-09-14T17:32:16.998Z",
   "owner": "APpery1",
   "repos": [
     {
@@ -9,7 +9,18 @@
       "descZh": "",
       "descEn": "",
       "language": "JavaScript",
-      "pushedAt": "2026-09-14T11:03:25Z",
+      "pushedAt": "2026-09-14T17:31:53Z",
+      "stars": 0,
+      "fork": false
+    },
+    {
+      "name": "pic",
+      "url": "https://github.com/APpery1/pic",
+      "description": "PicGo 图床 / image hosting",
+      "descZh": "",
+      "descEn": "",
+      "language": null,
+      "pushedAt": "2026-09-14T16:58:36Z",
       "stars": 0,
       "fork": false
     },
