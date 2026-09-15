@@ -55,6 +55,11 @@ const zh = {
   'docs.empty': '还没有放上来。整理好之后会出现在这里。',
   'docs.open': '打开文档',
   'docs.count': '篇',
+  'docs.back': '返回文档列表',
+  'docs.missing': '找不到这篇文档。',
+  'docs.prev': '上一篇',
+  'docs.next': '下一篇',
+  'docs.pager': '相邻文档',
 
   'album.kicker': '04',
   'album.title': '相册',
@@ -141,6 +146,11 @@ const en: Record<MessageKey, string> = {
   'docs.empty': 'Nothing here yet. Pieces will appear once they are ready.',
   'docs.open': 'Open document',
   'docs.count': 'pieces',
+  'docs.back': 'Back to docs',
+  'docs.missing': 'This document was not found.',
+  'docs.prev': 'Previous',
+  'docs.next': 'Next',
+  'docs.pager': 'Adjacent documents',
 
   'album.kicker': '04',
   'album.title': 'Album',

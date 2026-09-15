@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ProjectList } from '../components/ProjectList'
+import { ResearchBody } from '../components/ResearchBody'
 import type { MessageKey } from '../i18n/dict'
 import { useI18n } from '../i18n/LanguageContext'
 import { getDocs } from '../lib/docs'
@@ -142,7 +143,7 @@ export function WorkPage({ panel, onOpen, onClose }: Props) {
             {active.id === 'projects' ? (
               <ProjectList />
             ) : (
-              <p className="research__body">{t('skills.body')}</p>
+              <ResearchBody />
             )}
           </div>
         </div>

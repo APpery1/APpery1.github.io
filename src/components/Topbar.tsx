@@ -10,17 +10,20 @@ const NAV = [
 
 type Props = {
   page: PageId
+  docSlug?: string | null
 }
 
-export function Topbar({ page }: Props) {
+export function Topbar({ page, docSlug = null }: Props) {
   const { t } = useI18n()
   const showBack = page === 'album' || page === 'docs'
+  const backHref = page === 'docs' && docSlug ? '#docs' : '#work'
+  const backLabel = page === 'docs' && docSlug ? t('docs.back') : t('page.backToWork')
 
   return (
     <header className="topbar">
       <div className="container topbar__inner">
         {showBack ? (
-          <a className="topbar__back" href="#work" aria-label={t('page.backToWork')}>
+          <a className="topbar__back" href={backHref} aria-label={backLabel}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
                 d="M15 18l-6-6 6-6"

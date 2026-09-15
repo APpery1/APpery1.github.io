@@ -22,10 +22,15 @@ export type Photo = {
   alt: string
 }
 
+export type DocKind = 'md' | 'txt' | 'pdf' | 'html'
+
 export type Doc = {
   title: string
+  slug: string
+  kind: DocKind
   description: string
   href?: string
+  content?: string
   date?: string
 }
 

@@ -18,13 +18,17 @@ export default function App() {
   const [showIntro, setShowIntro] = useState(() => sessionStorage.getItem('appery-intro-seen') !== '1')
   const [panel, setPanel] = useState<PanelId | null>(() => parseHash(window.location.hash).panel)
   const [page, setPage] = useState<PageId>(() => parseHash(window.location.hash).page)
+  const [docSlug, setDocSlug] = useState<string | null>(() => parseHash(window.location.hash).doc)
   const scrollerRef = useRef<HTMLElement | null>(null)
   const hub = isHubPage(page)
+  const viewingDoc = page === 'docs' && Boolean(docSlug)
+  const reading = viewingDoc || panel === 'research'
 
   const syncFromHash = useCallback(() => {
     const next = parseHash(window.location.hash)
     setPanel(next.panel)
     setPage(next.page)
+    setDocSlug(next.doc)
   }, [])
 
   useEffect(() => {
@@ -42,12 +46,12 @@ export default function App() {
     if (page !== 'docs') return
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        window.location.hash = 'work'
+        window.location.hash = viewingDoc ? 'docs' : 'work'
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [page])
+  }, [page, viewingDoc])
 
   useEffect(() => {
     const root = scrollerRef.current
@@ -88,6 +92,7 @@ export default function App() {
   }, [])
 
   const showFx = page !== 'album'
+  const showCursor = showFx && !reading
 
   const shell = (
     <>
@@ -124,8 +129,8 @@ export default function App() {
         </div>
       ) : null}
       <SkipLink />
-      <Topbar page={page} />
-      {showFx ? (
+      <Topbar page={page} docSlug={docSlug} />
+      {showCursor ? (
         <TargetCursor
           targetSelector=".cursor-target"
           spinDuration={2}
@@ -144,7 +149,7 @@ export default function App() {
           </div>
         ) : page === 'docs' ? (
           <div className="page-slot is-active">
-            <DocsPage />
+            <DocsPage slug={docSlug} />
           </div>
         ) : (
           <>
