@@ -1,18 +1,7 @@
 {
-  "generatedAt": "2026-09-17T23:38:05.127Z",
+  "generatedAt": "2026-09-18T23:32:28.594Z",
   "owner": "APpery1",
   "repos": [
-    {
-      "name": "pic",
-      "url": "https://github.com/APpery1/pic",
-      "description": "PicGo 图床 / image hosting",
-      "descZh": "",
-      "descEn": "",
-      "language": null,
-      "pushedAt": "2026-09-17T17:15:35Z",
-      "stars": 0,
-      "fork": false
-    },
     {
       "name": "APpery1",
       "url": "https://github.com/APpery1/APpery1",
@@ -20,7 +9,7 @@
       "descZh": "",
       "descEn": "",
       "language": null,
-      "pushedAt": "2026-09-17T08:52:05Z",
+      "pushedAt": "2026-09-18T08:27:42Z",
       "stars": 0,
       "fork": false
     },
@@ -31,7 +20,18 @@
       "descZh": "",
       "descEn": "",
       "language": "JavaScript",
-      "pushedAt": "2026-09-16T23:46:45Z",
+      "pushedAt": "2026-09-17T23:38:44Z",
+      "stars": 0,
+      "fork": false
+    },
+    {
+      "name": "pic",
+      "url": "https://github.com/APpery1/pic",
+      "description": "PicGo 图床 / image hosting",
+      "descZh": "",
+      "descEn": "",
+      "language": null,
+      "pushedAt": "2026-09-17T17:15:35Z",
       "stars": 0,
       "fork": false
     },
