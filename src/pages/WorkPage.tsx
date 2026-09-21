@@ -3,7 +3,7 @@ import { ProjectList } from '../components/ProjectList'
 import { ResearchBody } from '../components/ResearchBody'
 import type { MessageKey } from '../i18n/dict'
 import { useI18n } from '../i18n/LanguageContext'
-import { getDocs } from '../lib/docs'
+import { getCategories, getDocs } from '../lib/docs'
 import { getPhotos } from '../lib/photos'
 import { getRepos } from '../lib/repos'
 import type { PanelId } from '../types'
@@ -38,6 +38,7 @@ export function WorkPage({ panel, onOpen, onClose }: Props) {
   const [cardsVisible, setCardsVisible] = useState(false)
   const repos = getRepos()
   const docs = getDocs()
+  const categories = getCategories()
   const photos = getPhotos()
 
   useEffect(() => {
@@ -76,11 +77,10 @@ export function WorkPage({ panel, onOpen, onClose }: Props) {
     research: t('skills.body'),
     docs:
       docs.length > 0
-        ? `${docs.length} ${t('docs.count')} · ${docs
-            .slice(0, 2)
-            .map((doc) => doc.title)
-            .join(' / ')}`
-        : t('docs.empty'),
+        ? `${docs.length} ${t('docs.count')} · ${categories.join(' / ')}`
+        : categories.length > 0
+          ? `${categories.length} ${t('docs.categoryCount')} · ${categories.join(' / ')}`
+          : t('docs.empty'),
     album:
       photos.length > 0 ? `${photos.length} ${t('album.count')}` : t('album.empty'),
   }

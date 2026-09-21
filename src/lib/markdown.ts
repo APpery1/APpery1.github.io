@@ -8,10 +8,13 @@ function escapeHtml(value: string): string {
     .replaceAll('"', '&quot;')
 }
 
+let linkCategory = ''
+
 function rewriteHref(href: string): string {
   const local = href.match(/^(?:\.\/)?([^/\\]+)\.(md|txt|MD|TXT)$/)
   if (local) {
-    return `#docs/${encodeURIComponent(local[1])}`
+    const slug = encodeURIComponent(local[1])
+    return linkCategory ? `#docs/${encodeURIComponent(linkCategory)}/${slug}` : `#docs/${slug}`
   }
   return href
 }
@@ -55,6 +58,12 @@ const marked = new Marked({
 
 type TokenLike = Tokens.Link['tokens']
 
-export function renderMarkdown(source: string): string {
-  return marked.parse(source, { async: false }) as string
+export function renderMarkdown(source: string, category?: string): string {
+  const previous = linkCategory
+  linkCategory = category ?? ''
+  try {
+    return marked.parse(source, { async: false }) as string
+  } finally {
+    linkCategory = previous
+  }
 }

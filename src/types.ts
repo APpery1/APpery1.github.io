@@ -27,6 +27,7 @@ export type DocKind = 'md' | 'txt' | 'pdf' | 'html'
 export type Doc = {
   title: string
   slug: string
+  category: string
   kind: DocKind
   description: string
   href?: string

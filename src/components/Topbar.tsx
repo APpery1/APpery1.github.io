@@ -11,13 +11,24 @@ const NAV = [
 type Props = {
   page: PageId
   docSlug?: string | null
+  docCategory?: string | null
 }
 
-export function Topbar({ page, docSlug = null }: Props) {
+export function Topbar({ page, docSlug = null, docCategory = null }: Props) {
   const { t } = useI18n()
   const showBack = page === 'album' || page === 'docs'
-  const backHref = page === 'docs' && docSlug ? '#docs' : '#work'
-  const backLabel = page === 'docs' && docSlug ? t('docs.back') : t('page.backToWork')
+  const backHref =
+    page === 'docs' && docSlug && docCategory
+      ? `#docs/${encodeURIComponent(docCategory)}`
+      : page === 'docs' && (docSlug || docCategory)
+        ? '#docs'
+        : '#work'
+  const backLabel =
+    page === 'docs' && docSlug
+      ? t('docs.back')
+      : page === 'docs' && docCategory
+        ? t('docs.backToCategories')
+        : t('page.backToWork')
 
   return (
     <header className="topbar">

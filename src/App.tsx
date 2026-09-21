@@ -19,6 +19,7 @@ export default function App() {
   const [panel, setPanel] = useState<PanelId | null>(() => parseHash(window.location.hash).panel)
   const [page, setPage] = useState<PageId>(() => parseHash(window.location.hash).page)
   const [docSlug, setDocSlug] = useState<string | null>(() => parseHash(window.location.hash).doc)
+  const [docCategory, setDocCategory] = useState<string | null>(() => parseHash(window.location.hash).category)
   const scrollerRef = useRef<HTMLElement | null>(null)
   const hub = isHubPage(page)
   const viewingDoc = page === 'docs' && Boolean(docSlug)
@@ -29,6 +30,7 @@ export default function App() {
     setPanel(next.panel)
     setPage(next.page)
     setDocSlug(next.doc)
+    setDocCategory(next.category)
   }, [])
 
   useEffect(() => {
@@ -45,13 +47,18 @@ export default function App() {
   useEffect(() => {
     if (page !== 'docs') return
     function onKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        window.location.hash = viewingDoc ? 'docs' : 'work'
+      if (event.key !== 'Escape') return
+      if (docSlug && docCategory) {
+        window.location.hash = `docs/${encodeURIComponent(docCategory)}`
+      } else if (docSlug || docCategory) {
+        window.location.hash = 'docs'
+      } else {
+        window.location.hash = 'work'
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [page, viewingDoc])
+  }, [page, docSlug, docCategory])
 
   useEffect(() => {
     const root = scrollerRef.current
@@ -129,7 +136,7 @@ export default function App() {
         </div>
       ) : null}
       <SkipLink />
-      <Topbar page={page} docSlug={docSlug} />
+      <Topbar page={page} docSlug={docSlug} docCategory={docCategory} />
       {showCursor ? (
         <TargetCursor
           targetSelector=".cursor-target"
@@ -149,7 +156,7 @@ export default function App() {
           </div>
         ) : page === 'docs' ? (
           <div className="page-slot is-active">
-            <DocsPage slug={docSlug} />
+            <DocsPage category={docCategory} slug={docSlug} />
           </div>
         ) : (
           <>

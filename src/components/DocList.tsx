@@ -5,12 +5,16 @@ function isExternal(kind: string): boolean {
   return kind === 'pdf' || kind === 'html'
 }
 
-export function DocList() {
+type Props = {
+  category: string
+}
+
+export function DocList({ category }: Props) {
   const { t } = useI18n()
-  const docs = getDocs()
+  const docs = getDocs(category)
 
   if (docs.length === 0) {
-    return <p className="empty-state">{t('docs.empty')}</p>
+    return <p className="empty-state">{t('docs.categoryEmpty')}</p>
   }
 
   return (
@@ -36,7 +40,7 @@ export function DocList() {
         )
 
         return (
-          <li key={doc.slug}>
+          <li key={`${doc.category}/${doc.slug}`}>
             {doc.href ? (
               <a
                 className="doc-card cursor-target"
