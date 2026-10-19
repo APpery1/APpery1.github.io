@@ -1,93 +1,46 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { preparePhotos } from './scripts/prepare-photos.mjs'
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
+import { defineConfig, type Plugin } from "vite";
+import react from "@vitejs/plugin-react";
 
-const root = path.dirname(fileURLToPath(import.meta.url))
-const documentDir = path.join(root, 'document')
-const DOC_CATEGORIES_ID = 'virtual:doc-categories'
-const RESOLVED_DOC_CATEGORIES_ID = `\0${DOC_CATEGORIES_ID}`
-
-function scanDocCategories(): string[] {
-  try {
-    return fs
+const documentDir = fileURLToPath(new URL("./document", import.meta.url));
+const virtualId = "virtual:doc-categories";
+const resolvedId = "\0" + virtualId;
+const categoriesPlugin = (): Plugin => ({
+  name: "document-categories",
+  resolveId(id) {
+    if (id === virtualId) return resolvedId;
+  },
+  load(id) {
+    if (id !== resolvedId) return;
+    const categories = fs
       .readdirSync(documentDir, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+      .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
       .map((entry) => entry.name)
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-  } catch {
-    return []
-  }
-}
-
-function isInsideDocumentDir(file: string): boolean {
-  const resolved = path.resolve(file)
-  return resolved === documentDir || resolved.startsWith(documentDir + path.sep)
-}
-
-function docCategoriesPlugin() {
-  return {
-    name: 'doc-categories',
-    resolveId(id: string) {
-      if (id === DOC_CATEGORIES_ID) return RESOLVED_DOC_CATEGORIES_ID
-    },
-    load(id: string) {
-      if (id !== RESOLVED_DOC_CATEGORIES_ID) return
-      return `export const categories = ${JSON.stringify(scanDocCategories())}`
-    },
-    configureServer(server) {
-      server.watcher.add(documentDir)
-      const invalidate = (file: string) => {
-        if (!isInsideDocumentDir(file)) return
-        const mod = server.moduleGraph.getModuleById(RESOLVED_DOC_CATEGORIES_ID)
-        if (mod) void server.reloadModule(mod)
-      }
-      server.watcher.on('add', invalidate)
-      server.watcher.on('unlink', invalidate)
-      server.watcher.on('addDir', invalidate)
-      server.watcher.on('unlinkDir', invalidate)
-    },
-  }
-}
-
-function photoPreparePlugin() {
-  return {
-    name: 'prepare-photos',
-    async buildStart() {
-      await preparePhotos()
-    },
-    configureServer(server) {
-      const photoDir = path.join(root, 'photo')
-      server.watcher.add(photoDir)
-      const rerun = async (file: string) => {
-        const normalized = file.replace(/\\/g, '/')
-        if (!normalized.includes('/photo/')) return
-        if (normalized.includes('/photo/.thumbs/') || normalized.includes('/photo/.full/')) return
-        await preparePhotos()
-      }
-      server.watcher.on('add', rerun)
-      server.watcher.on('change', rerun)
-    },
-  }
-}
+      .sort();
+    return `export const categories = ${JSON.stringify(categories)}`;
+  },
+  configureServer(server) {
+    server.watcher.add(documentDir);
+    const reload = (file: string) => {
+      if (
+        !file
+          .replaceAll("\\", "/")
+          .startsWith(documentDir.replaceAll("\\", "/"))
+      )
+        return;
+      const module = server.moduleGraph.getModuleById(resolvedId);
+      if (module) void server.reloadModule(module);
+    };
+    server.watcher.on("addDir", reload);
+    server.watcher.on("unlinkDir", reload);
+  },
+});
 
 export default defineConfig({
-  plugins: [photoPreparePlugin(), docCategoriesPlugin(), react()],
-  base: '/',
-  assetsInclude: ['**/*.pdf', '**/*.md', '**/*.txt'],
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    emptyOutDir: true,
-  },
-  server: {
-    port: 8080,
-    strictPort: true,
-  },
-  preview: {
-    port: 8080,
-    strictPort: true,
-  },
-})
+  plugins: [react(), categoriesPlugin()],
+  base: "./",
+  server: { host: "127.0.0.1", port: 5174, strictPort: true },
+  preview: { host: "127.0.0.1", port: 5174, strictPort: true },
+  build: { chunkSizeWarningLimit: 700 },
+});

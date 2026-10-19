@@ -1,0 +1,169 @@
+{
+  "source": "blender/city_model.blend",
+  "sourceSha256": "e9ae1572befdccb1bbd60fdf48c34f95134a712e8aa00c05125044481a9c4bcb",
+  "sourceObjects": 5475,
+  "fps": 24,
+  "duration": 32,
+  "camera": {
+    "position": [
+      126,
+      154,
+      170
+    ],
+    "rotation": [
+      0.8450465798377991,
+      0.4331180155277252,
+      0.14300942420959473,
+      0.2790223956108093
+    ],
+    "orthoScale": 198
+  },
+  "landmarks": {
+    "about": {
+      "bounds": {
+        "min": [
+          21,
+          0.125,
+          20.700001
+        ],
+        "max": [
+          47,
+          13.8,
+          36.200001
+        ]
+      },
+      "objects": 143
+    },
+    "projects": {
+      "bounds": {
+        "min": [
+          22.5,
+          0.1,
+          -29.549999
+        ],
+        "max": [
+          35.5,
+          29.550001,
+          -19.049999
+        ]
+      },
+      "objects": 107
+    },
+    "research": {
+      "bounds": {
+        "min": [
+          -56,
+          0.09,
+          -48.5
+        ],
+        "max": [
+          -26,
+          15.15793,
+          -25.5
+        ]
+      },
+      "objects": 95
+    },
+    "docs": {
+      "bounds": {
+        "min": [
+          -20.299999,
+          0.125,
+          -45.5
+        ],
+        "max": [
+          10.3,
+          15.7,
+          -19.049999
+        ]
+      },
+      "objects": 143
+    },
+    "album": {
+      "bounds": {
+        "min": [
+          -45,
+          0.14,
+          20.800001
+        ],
+        "max": [
+          -25,
+          10.65,
+          35.600002
+        ]
+      },
+      "objects": 30
+    },
+    "contact": {
+      "bounds": {
+        "min": [
+          -13.5,
+          0.11,
+          21.799999
+        ],
+        "max": [
+          8.5,
+          12.8,
+          36.299999
+        ]
+      },
+      "objects": 61
+    },
+    "game": {
+      "bounds": {
+        "min": [
+          -14.496,
+          0.17,
+          41.936672
+        ],
+        "max": [
+          -9.504,
+          4.4772,
+          46.863327
+        ]
+      },
+      "objects": 53
+    },
+    "airport": {
+      "bounds": {
+        "min": [
+          21.999998,
+          0.15,
+          -53.599998
+        ],
+        "max": [
+          62.700001,
+          16.200001,
+          -29.195339
+        ]
+      },
+      "objects": 51
+    },
+    "highway": {
+      "bounds": {
+        "min": [
+          -73.074997,
+          -0.12,
+          -7.62
+        ],
+        "max": [
+          73,
+          4.385,
+          -3.18
+        ]
+      },
+      "objects": 178
+    }
+  },
+  "gameHouse": "HOUSE 27 | move entire building",
+  "geometryObjects": 5223,
+  "webBatches": 605,
+  "animatedNodes": 204,
+  "sourceUnchanged": true,
+  "modelBytes": 2059228,
+  "modelSha256": "2be97416bfbcdcc6ac0d4686bf1ab0d8d0130a8335f5ac7e1194f5dc594c9e77",
+  "animationClips": 1,
+  "animationChannels": 246,
+  "materials": 30,
+  "meshes": 532
+}

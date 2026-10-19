@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="title description">
+  <title id="title">沿途 · 小轿车加载界面</title>
+  <desc id="description">雾蓝色天空下，一辆珊瑚橙色小轿车沿着屏幕中央的进度条前进，周围有云朵、山丘与小树。</desc>
+  <view id="mobile" viewBox="480 0 480 960" preserveAspectRatio="xMidYMid meet"/>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#eaf3f6"/><stop offset="1" stop-color="#f7faf9"/></linearGradient>
+    <linearGradient id="progressColor"><stop stop-color="#eeb49d"/><stop offset="1" stop-color="#dc775e"/></linearGradient>
+    <filter id="carShadow" x="-40%" y="-50%" width="180%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+    <g id="cloud" fill="none" stroke="#bacdd3" stroke-width="1.5" stroke-linecap="round"><path d="M0 20h75c11 0 11-15 0-15h-8C64-9 45-10 39 3 29-5 16 2 17 12H8c-8 0-10 8-8 8Z"/></g>
+    <g id="tree"><path d="M0 0v42m0-23-10-9M0 25l10-9" stroke="#94b0ac" stroke-width="2" stroke-linecap="round"/><path d="M-19 0c0-15 9-28 19-28S19-15 19 0 10 19 0 19-19 15-19 0" fill="#d2e3dc"/><path d="M0-14v56m0-28-8-8m8 15 9-9" stroke="#94b0ac" stroke-width="1.5" fill="none" stroke-linecap="round"/></g>
+    <style>
+      text{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;fill:#405b65}
+      .subtle{fill:#849ba2}.tiny{font-size:12px;letter-spacing:2px}
+      #car-position{animation:drive 9s cubic-bezier(.22,.55,.35,1) infinite}
+      #progress{animation:fill 9s cubic-bezier(.22,.55,.35,1) infinite}
+      .car-body{animation:ride .65s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
+      .wheel-spoke{animation:spin .65s linear infinite;transform-box:fill-box;transform-origin:center}
+      .cloud-drift{animation:drift 12s ease-in-out infinite alternate}
+      @keyframes drive{0%,8%{transform:translate(560px,480px)}88%,100%{transform:translate(880px,480px)}}
+      @keyframes fill{0%,8%{width:0}88%,100%{width:320px}}
+      @keyframes ride{to{transform:translateY(-1.4px) rotate(.4deg)}}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      @keyframes drift{to{transform:translateX(12px)}}
+      .controlled #car-position,.controlled #progress{animation:none}
+      @media(max-aspect-ratio:3/4){
+        .brand{transform:translate(512px,58px)}
+        .corner-note{display:none}
+        .sun{transform:translate(-190px,0)}
+        .trees-left{transform:translate(250px,0)}
+        .trees-right{transform:translate(-250px,0)}
+        #status,#percentage{font-size:16px}
+        .footer-note{font-size:14px;letter-spacing:1px}
+      }
+      @media(prefers-reduced-motion:reduce){*{animation:none!important}#car-position{transform:translate(720px,480px)}#progress{width:160px}}
+    </style>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1440v960H0z"/>
+  <!-- Quiet scenery keeps the little car as the focal point. -->
+  <g class="sun"><circle cx="1070" cy="238" r="40" fill="#f0dfb6" opacity=".65"/>
+  <circle cx="1070" cy="238" r="54" fill="none" stroke="#e5dbbd" opacity=".4"/></g>
+  <g class="cloud-drift" opacity=".65"><use href="#cloud" x="325" y="249"/><use href="#cloud" transform="translate(943 347) scale(.7)"/><use href="#cloud" transform="translate(1160 176) scale(.55)"/></g>
+  <path d="M0 704c115-56 184-48 287-10 115 43 165 35 262-12 93-45 164-26 266 13 136 52 215-39 332-36 109 3 195 46 293 26v275H0Z" fill="#e5efeb"/>
+  <path d="M0 785c147 13 219-82 360-55 124 24 180 51 303 24 163-35 227-30 345 13 150 54 280-45 432-19v212H0Z" fill="#dbe9e3" opacity=".75"/>
+  <path d="M0 840c176-36 267-4 398 23 191 40 326-19 492-21 230-2 310 52 550 3v115H0Z" fill="#cfdfd7" opacity=".5"/>
+  <g opacity=".8"><g class="trees-left"><use href="#tree" transform="translate(293 701) scale(.83)"/><use href="#tree" transform="translate(319 721) scale(.52)"/></g><g class="trees-right"><use href="#tree" transform="translate(1110 724) scale(.9)"/><use href="#tree" transform="translate(1140 738) scale(.56)"/></g></g>
+  <g fill="none" stroke="#a6beb2" stroke-width="1.5" stroke-linecap="round" opacity=".6"><path d="m213 817 3-7 3 7m6 1 3-10 3 10M1183 854l3-8 3 8m8-2 3-11 3 11"/><path d="M108 756h26m-13 6h28m1079 43h20"/></g>
+  <g class="brand" transform="translate(68 58)"><path d="M0 11c8-15 15 15 23 0s15 15 23 0" fill="none" stroke="#6d8e90" stroke-width="2.5" stroke-linecap="round"/><text x="59" y="18" font-size="19" font-weight="600" letter-spacing="4">沿途</text></g>
+  <text x="1370" y="75" text-anchor="end" class="subtle tiny corner-note">把等待，交给风景</text>
+  <g text-anchor="middle">
+    <text x="720" y="367" font-size="13" letter-spacing="5" class="subtle">美好正在靠近</text>
+    <text x="720" y="415" font-size="30" font-weight="500" letter-spacing="3">出发前的小小等待</text>
+  </g>
+  <!-- Track is 320 units long; the car's centre is the exact progress endpoint. -->
+  <rect x="560" y="481" width="320" height="5" rx="2.5" fill="#cfdddf"/>
+  <rect id="progress" x="560" y="481" width="0" height="5" rx="2.5" fill="url(#progressColor)"/>
+  <path d="M560 499v4m80-4v4m80-4v4m80-4v4m80-4v4" fill="none" stroke="#bbcccf" stroke-linecap="round"/>
+  <g id="car-position" transform="translate(560 480)">
+    <ellipse cx="0" cy="0" rx="29" ry="3" fill="#6c8586" opacity=".18" filter="url(#carShadow)"/>
+    <g class="car-body">
+      <path d="m-30-17 7-3 8-15q2-4 7-4H8q5 0 8 5l8 13 10 3q4 1 4 6v6h-70v-6q0-4 2-5Z" fill="#df8067"/>
+      <path d="m-18-21 7-12q1-2 4-2H7q3 0 5 3l7 11Z" fill="#d9ecec"/>
+      <path d="M0-35v14" stroke="#c86a54" stroke-width="3"/>
+      <path d="M-30-18h62" stroke="#edaa8d" stroke-width="2" stroke-linecap="round"/>
+      <path d="M3-16h5" stroke="#af5c4b" stroke-width="2" stroke-linecap="round"/>
+      <rect x="30" y="-15" width="7" height="5" rx="1.5" fill="#f7e4b6"/>
+      <rect x="-32" y="-14" width="4" height="5" rx="1" fill="#b85e52"/>
+      <path d="M-34-6h72" stroke="#b86755" stroke-width="3" stroke-linecap="round"/>
+      <g fill="#40545b" stroke="#e9f0ec" stroke-width="2"><circle cx="-20" cy="-5" r="7"/><circle cx="23" cy="-5" r="7"/></g>
+      <g fill="#a8b9ba"><circle cx="-20" cy="-5" r="2.5"/><circle cx="23" cy="-5" r="2.5"/></g>
+      <g class="wheel-spoke"><path d="M-23-5h6m-3-3v6" stroke="#e0e8e5" stroke-width="1"/></g>
+      <g class="wheel-spoke"><path d="M20-5h6m-3-3v6" stroke="#e0e8e5" stroke-width="1"/></g>
+    </g>
+  </g>
+  <text x="560" y="537" font-size="12" class="subtle" id="status">正在驶入APpery小镇</text>
+  <text x="880" y="537" font-size="13" text-anchor="end" class="subtle" id="percentage">加载中</text>
+  <g text-anchor="middle"><text class="footer-note" x="720" y="890" font-size="11" letter-spacing="3" fill="#8da49b">每一次抵达，都从这里开始</text></g>
+</svg>

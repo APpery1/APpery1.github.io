@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#101a22" />
+    <title>上高架 · 鹈鹕竞速</title>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #101a22; }
+      .race-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #101a22; }
+      .race-veil { position: fixed; inset: 0; z-index: 6; display: grid; place-items: center; background: #101a22; color: #f1d292; pointer-events: none; }
+      .race-veil.is-open { animation: veil-out 0.62s ease forwards; }
+      .race-veil.is-close { animation: veil-in 0.56s ease forwards; }
+      .race-road { width: min(560px, 86vw); height: 210px; position: relative; overflow: hidden; }
+      .race-road i, .race-road b, .race-road em { position: absolute; top: -20%; width: 7px; height: 150%; background: repeating-linear-gradient(#efe0b4 0 16px, transparent 16px 34px); animation: lane-rush 0.42s linear infinite; }
+      .race-road i { left: 18%; transform: perspective(180px) rotateX(58deg); }
+      .race-road b { left: calc(50% - 3px); transform: perspective(180px) rotateX(62deg) scaleX(1.15); }
+      .race-road em { right: 18%; transform: perspective(180px) rotateX(58deg); }
+      .race-car { position: absolute; left: 50%; bottom: 18px; width: 74px; height: 34px; margin-left: -37px; }
+      .race-car span { position: absolute; inset: 8px 6px auto; height: 16px; border-radius: 8px 10px 3px 3px; background: #f4efe0; }
+      .race-car span:before { content: ""; position: absolute; left: 8px; top: 3px; width: 22px; height: 8px; border-radius: 3px; background: #3d8eb0; }
+      .race-car span:after { content: ""; position: absolute; right: 6px; top: -7px; width: 16px; height: 8px; border-radius: 8px 8px 2px 2px; background: #f0b15a; }
+      .race-car u { position: absolute; bottom: 4px; width: 12px; height: 12px; border-radius: 50%; background: #243028; }
+      .race-car u:first-of-type { left: 10px; }
+      .race-car u:last-of-type { right: 10px; }
+      .race-veil p { position: absolute; top: 22%; margin: 0; font: 600 15px "Segoe UI", "Microsoft YaHei", sans-serif; letter-spacing: 1px; }
+      @keyframes lane-rush { to { background-position: 0 34px; } }
+      @keyframes veil-out { to { opacity: 0; visibility: hidden; } }
+      @keyframes veil-in { from { opacity: 0; } to { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .race-veil, .race-road i, .race-road b, .race-road em { animation: none; }
+        .race-veil.is-open { opacity: 0; visibility: hidden; }
+      }
+    </style>
+  </head>
+  <body>
+    <iframe class="race-frame" src="./game.html" title="鹈鹕竞速"></iframe>
+    <div class="race-veil" id="race-veil" role="status">
+      <p>上高架</p>
+      <div class="race-road" aria-hidden="true"><i></i><b></b><em></em><div class="race-car"><span></span><u></u><u></u></div></div>
+    </div>
+    <script>
+      const frame = document.querySelector(".race-frame");
+      const veil = document.getElementById("race-veil");
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const leave = () => {
+        if (reduced) {
+          location.href = "../#work";
+          return;
+        }
+        veil.classList.remove("is-open");
+        veil.style.visibility = "visible";
+        veil.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 520,
+          fill: "forwards",
+          easing: "ease",
+        });
+        veil.querySelector("p").textContent = "回到街区";
+        setTimeout(() => {
+          try { sessionStorage.setItem("appery-race-return", "1"); } catch (error) {}
+          location.href = "../#work";
+        }, 560);
+      };
+      frame.addEventListener("load", () => {
+        if (!reduced) veil.classList.add("is-open");
+        else veil.classList.add("is-open");
+        const back = frame.contentDocument && frame.contentDocument.querySelector(".site-back");
+        if (back) back.addEventListener("click", (event) => { event.preventDefault(); leave(); });
+      });
+      for (const type of ["keydown", "keyup"]) {
+        window.addEventListener(type, (event) => {
+          if (!frame.contentWindow || document.activeElement === frame) return;
+          frame.contentWindow.dispatchEvent(new KeyboardEvent(type, { key: event.key, code: event.code, bubbles: true, cancelable: true }));
+        });
+      }
+    </script>
+  </body>
+</html>

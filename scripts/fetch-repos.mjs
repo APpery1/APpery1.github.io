@@ -27,6 +27,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyPublicMetadata } from './public-metadata.mjs';
 
 import {
   SnapshotInputError,
@@ -41,6 +42,7 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(SCRIPT_DIR, '..');
 const CONFIG_PATH = path.join(PROJECT_ROOT, 'data', 'site-config.json');
 const OVERRIDES_PATH = path.join(PROJECT_ROOT, 'data', 'repo-overrides.json');
+const PUBLIC_METADATA_PATH = path.join(PROJECT_ROOT, 'data', 'public-metadata.json');
 const SNAPSHOT_JSON_PATH = path.join(PROJECT_ROOT, 'data', 'repos.json');
 const SNAPSHOT_JS_PATH = path.join(PROJECT_ROOT, 'data', 'repos.js');
 
@@ -250,7 +252,13 @@ async function main() {
   log('置顶 pinned      : ' + (config.pinned.length ? config.pinned.join(', ') : '（空）'));
   log('展示元信息       : ' + (config.showMeta ? '是' : '否'));
 
-  const { repos: fetched, rate } = await fetchAllRepos(apiBaseUrl, config.owner);
+  const { repos: incoming, rate } = await fetchAllRepos(apiBaseUrl, config.owner);
+  let fetched;
+  try {
+    fetched = applyPublicMetadata(incoming, readJsonFile(PUBLIC_METADATA_PATH, 'data/public-metadata.json', EXIT.CONFIG));
+  } catch (error) {
+    abort(EXIT.CONFIG, error.message, '未写入任何文件');
+  }
   log('抓取到仓库       : ' + fetched.length + ' 个' + (rate ? '（API 额度：' + rate + '）' : ''));
 
   let normalized;

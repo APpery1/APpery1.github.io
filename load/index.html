@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>沿途 · 加载中</title>
+  <style>
+    :root { color-scheme: light; background: #eaf3f6; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #eaf3f6; }
+    .loading-screen { width: 100%; height: 100vh; height: 100dvh; display: grid; place-items: center; }
+    .loading-picture { display: block; width: 100%; height: 100%; min-height: 0; }
+    .loading-art { display: block; width: 100%; height: 100%; }
+    @media (max-aspect-ratio: 3/4) {
+      .loading-art { object-fit: contain; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .loading-screen::after { content: '加载中'; position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    }
+  </style>
+</head>
+<body>
+  <main class="loading-screen" aria-label="页面加载中" aria-busy="true">
+    <picture class="loading-picture">
+      <source media="(max-aspect-ratio: 3/4)" srcset="./loading.svg#mobile">
+      <img class="loading-art" src="./loading.svg" alt="一辆珊瑚橙色小轿车沿着进度条向前行驶，正在驶入APpery小镇。">
+    </picture>
+  </main>
+</body>
+</html>
