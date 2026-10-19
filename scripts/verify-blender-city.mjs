@@ -120,10 +120,15 @@ export async function verify3DControls(page, check, screenshot) {
     Number(await map.getAttribute("data-draw-calls")) < 80 &&
       Number(await map.getAttribute("data-triangles")) > 100000,
   );
-  await page.locator(".map-hints").click();
+  const hints = page.locator(".map-hints");
+  await expect(hints).toHaveAttribute("aria-pressed", "true");
   await expect(map).toHaveClass(/show-entrances/);
   await screenshot(page, "city-entrances");
-  await page.locator(".map-hints").click();
+  await hints.click();
+  await expect(hints).toHaveAttribute("aria-pressed", "false");
+  await expect(map).not.toHaveClass(/show-entrances/);
+  await hints.click();
+  await expect(map).toHaveClass(/show-entrances/);
   const before = await map.getAttribute("data-camera-position");
   await page.locator(".map-rotate").click();
   await expect(map).not.toHaveAttribute("data-camera-position", before);
