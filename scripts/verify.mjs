@@ -223,6 +223,7 @@ try {
   };
   await page.goto(`${origin}/#city`, { waitUntil: "domcontentloaded" });
   await expect(page.locator("[data-loading-screen]")).toBeVisible();
+  await expect(page.locator("[data-loading-screen] button")).toHaveCount(0);
   await page.locator('[data-arrival="done"]').waitFor({ timeout: 15000 });
   await page.locator('.model-city[data-model-loaded="true"]').waitFor();
   check("首次进入使用 load 中的小车加载画面", true);
@@ -313,6 +314,14 @@ try {
     "data-camera-zoom",
     "1.20",
   );
+  await expect(page.locator(".zoom-controls > span")).toHaveText("120%");
+  await page.locator(".zoom-controls button").last().click();
+  await expect(page.locator(".city-viewport")).toHaveAttribute(
+    "data-camera-zoom",
+    "1.00",
+  );
+  await expect(page.locator(".zoom-controls > span")).toHaveText("100%");
+  await page.locator(".zoom-controls button").first().click();
   await page.locator(".city-viewport").focus();
   await page.keyboard.press("ArrowRight");
   await expect(page.locator(".model-city")).not.toHaveAttribute(
@@ -379,7 +388,10 @@ try {
       ),
     )
     .toBeGreaterThan(1);
-  const touchX = await touchPage
+  const touchPosition = await touchPage
+    .locator(".city-viewport")
+    .getAttribute("data-camera-position");
+  const touchTarget = await touchPage
     .locator(".city-viewport")
     .getAttribute("data-camera-target");
   await cdp.send("Input.dispatchTouchEvent", {
@@ -395,11 +407,42 @@ try {
     touchPoints: [],
   });
   await expect(touchPage.locator(".city-viewport")).not.toHaveAttribute(
-    "data-camera-target",
-    touchX,
+    "data-camera-position",
+    touchPosition,
   );
+  await expect(touchPage.locator(".city-viewport")).toHaveAttribute(
+    "data-camera-target",
+    touchTarget,
+  );
+  await cdp.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [
+      { id: 1, x: 90, y: 400 },
+      { id: 2, x: 300, y: 400 },
+    ],
+  });
+  await cdp.send("Input.dispatchTouchEvent", {
+    type: "touchMove",
+    touchPoints: [
+      { id: 1, x: 125, y: 400 },
+      { id: 2, x: 265, y: 400 },
+    ],
+  });
+  await cdp.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
+  await expect
+    .poll(async () =>
+      Number(
+        await touchPage
+          .locator(".city-viewport")
+          .getAttribute("data-camera-zoom"),
+      ),
+    )
+    .toBeLessThan(1.1);
   check(
-    "手机触摸拖动与双指缩放可用且不误入建筑",
+    "手机单指旋转、双指拨开放大和聚拢缩小且不误入建筑",
     touchPage.url().endsWith("#city"),
   );
   await touchContext.close();

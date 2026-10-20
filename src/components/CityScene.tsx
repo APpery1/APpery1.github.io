@@ -96,15 +96,19 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
                 button.dataset.hitY = hit.y.toFixed(2);
                 button.classList.toggle("is-offscreen", !p.visible);
               },
-              onView: () => setZoom(runtime.current?.camera.zoom ?? 1),
+              onView: setZoom,
             });
             runtime.current = engine;
             engine.setNight(callbacks.current.night);
           } catch {
             setFailure(true);
+            callbacks.current.onCityReady();
           }
         })
-        .catch(() => setFailure(true));
+        .catch(() => {
+          setFailure(true);
+          callbacks.current.onCityReady();
+        });
       return () => {
         cancelled = true;
         runtime.current?.dispose();
@@ -339,7 +343,7 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
                 <button
                   onClick={() => runtime.current?.zoom(1.2)}
                   aria-label={lang === "zh" ? "放大城市" : "Zoom in"}
-                  disabled={zoom >= 4.5}
+                  disabled={!ready || zoom >= 4.5 - 0.0001}
                 >
                   +
                 </button>
@@ -347,7 +351,7 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
                 <button
                   onClick={() => runtime.current?.zoom(1 / 1.2)}
                   aria-label={lang === "zh" ? "缩小城市" : "Zoom out"}
-                  disabled={zoom <= 0.5}
+                  disabled={!ready || zoom <= 0.5 + 0.0001}
                 >
                   −
                 </button>
@@ -404,8 +408,8 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
               <Icon name="move" size={15} />
               <span>
                 {lang === "zh"
-                  ? "拖动漫游 · 点击建筑"
-                  : "Drag to explore · Enter a building"}
+                  ? "拖动漫游 · 单指旋转 · 双指缩放"
+                  : "Drag to pan · Swipe to rotate · Pinch to zoom"}
               </span>
               <kbd>H</kbd>
               <span className="map-help-secondary">

@@ -26,10 +26,7 @@ const readNight = () => {
 };
 const alreadyArrived = () => {
   try {
-    return (
-      sessionStorage.getItem("appery-city-arrived") === "1" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
+    return sessionStorage.getItem("appery-city-arrived") === "1";
   } catch {
     return false;
   }
@@ -211,6 +208,7 @@ export default function App() {
     );
   };
   const activePlace = places.find((p) => p.id === route.place);
+  const arrivalActive = !arrived && !inside;
   return (
     <div
       className={`app ${inside ? "is-inside" : "is-outside"} ${entering ? "is-entering" : ""} ${returning ? "is-returning" : ""} ${mapQuiet ? "is-map-quiet" : ""}`}
@@ -224,6 +222,7 @@ export default function App() {
     >
       <a
         className="skip-link"
+        inert={arrivalActive}
         href="#main-content"
         onClick={(event) => {
           event.preventDefault();
@@ -232,7 +231,7 @@ export default function App() {
       >
         {lang === "zh" ? "跳到主要内容" : "Skip to main content"}
       </a>
-      <header className="site-header">
+      <header className="site-header" inert={arrivalActive}>
         <div className="city-brand-lockup">
           <a
             className="brand"
@@ -301,6 +300,7 @@ export default function App() {
       </header>
       <div
         className="main-viewport"
+        inert={arrivalActive}
         id="main-content"
         ref={contentRef}
         tabIndex={-1}
@@ -358,7 +358,7 @@ export default function App() {
           </main>
         )}
       </div>
-      <div className="city-dock-wrap">
+      <div className="city-dock-wrap" inert={arrivalActive}>
         {inside && (
           <button
             className="dock-home"
@@ -404,7 +404,7 @@ export default function App() {
               : "Central district · Choose a building"}
         </span>
       </div>
-      <footer className="site-footer">
+      <footer className="site-footer" inert={arrivalActive}>
         <span>© 2026 APpery</span>
         <span className="footer-center">
           {lang === "zh"
@@ -439,7 +439,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {!arrived && !inside && (
+      {arrivalActive && (
         <CityArrival
           progress={loadProgress}
           modelReady={cityReady}
@@ -511,8 +511,8 @@ export default function App() {
         </div>
         <small className="guide-help">
           {lang === "zh"
-            ? "Tab 选择建筑，Enter 进入。左键拖动或用方向键漫游，滚轮 / 双指缩放，按住鼠标中键旋转视角，Home 复位。右下角可总览全城、暂停动画或隐藏界面。"
-            : "Tab selects buildings; Enter steps inside. Left-drag or use arrow keys to explore, scroll or pinch to zoom, and hold the middle mouse button to rotate. Home resets the view. Map tools show the whole city, pause animations, or hide the controls."}
+            ? "Tab 选择建筑，Enter 进入。左键拖动或用方向键漫游，滚轮缩放，按住鼠标中键旋转视角。手机单指滑动旋转，双指拨开放大、聚拢缩小。Home 复位。右下角可总览全城、暂停动画或隐藏界面。"
+            : "Tab selects buildings; Enter steps inside. Left-drag or use arrow keys to explore, scroll to zoom, and hold the middle mouse button to rotate. On mobile, swipe with one finger to rotate, spread two fingers to zoom in, or pinch them together to zoom out. Home resets the view. Map tools show the whole city, pause animations, or hide the controls."}
         </small>
       </dialog>
     </div>

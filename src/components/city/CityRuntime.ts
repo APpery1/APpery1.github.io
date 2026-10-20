@@ -51,7 +51,7 @@ type Options = {
     point: ScreenPoint,
     hit: ScreenPoint,
   ) => void;
-  onView: () => void;
+  onView: (zoom: number) => void;
   onProgress?: (value: number) => void;
 };
 type BatchEntry = {
@@ -90,6 +90,7 @@ export class CityRuntime {
   private pointer = new THREE.Vector2();
   private start = { x: 0, y: 0 };
   private dragged = false;
+  private touchPointers = new Set<number>();
   private staticMaterials = new Set<THREE.MeshStandardMaterial>();
   private highlight = new THREE.Group();
   private selected: CityDestination | null = null;
@@ -138,7 +139,10 @@ export class CityRuntime {
       RIGHT: -1 as THREE.MOUSE,
     };
     this.controls.rotateSpeed = 0.45;
-    this.controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
+    this.controls.touches = {
+      ONE: THREE.TOUCH.ROTATE,
+      TWO: THREE.TOUCH.DOLLY_PAN,
+    };
     this.controls.addEventListener("change", this.changed);
     this.renderer.domElement.addEventListener(
       "pointerdown",
@@ -183,6 +187,7 @@ export class CityRuntime {
     this.renderer.domElement.addEventListener("pointerdown", this.down);
     this.renderer.domElement.addEventListener("pointermove", this.move);
     this.renderer.domElement.addEventListener("pointerup", this.up);
+    this.renderer.domElement.addEventListener("pointercancel", this.cancel);
     this.renderer.domElement.addEventListener("pointerleave", this.leave);
     this.renderer.domElement.addEventListener(
       "webglcontextlost",
@@ -196,7 +201,7 @@ export class CityRuntime {
   }
   private changed = () => {
     this.dirty = true;
-    this.options.onView();
+    this.options.onView(this.effectiveZoom());
   };
   private middleDown = (event: PointerEvent) => {
     if (event.button !== 1) return;
@@ -252,7 +257,7 @@ export class CityRuntime {
     this.mode = "explore";
     this.controls.update();
     this.dirty = true;
-    this.options.onView();
+    this.options.onView(this.effectiveZoom());
   }
   private async load() {
     try {
@@ -472,7 +477,7 @@ export class CityRuntime {
     this.applyLens();
     this.controls.update();
     this.dirty = true;
-    this.options.onView();
+    this.options.onView(this.effectiveZoom());
   }
   overview() {
     this.mode = "overview";
@@ -483,14 +488,13 @@ export class CityRuntime {
     const fovX = 2 * Math.atan(Math.tan(fovY / 2) * aspect);
     const radius = 102;
     const distance =
-      Math.max(radius / Math.sin(fovY / 2), radius / Math.sin(fovX / 2)) *
-      1.08;
+      Math.max(radius / Math.sin(fovY / 2), radius / Math.sin(fovX / 2)) * 1.08;
     const offset = this.home.clone().sub(this.homeTarget).setLength(distance);
     this.camera.position.copy(this.controls.target).add(offset);
     this.camera.up.set(0, 1, 0);
     this.controls.update();
     this.dirty = true;
-    this.options.onView();
+    this.options.onView(this.effectiveZoom());
   }
   pan(dx: number, dy: number) {
     const right = new THREE.Vector3().setFromMatrixColumn(
@@ -593,29 +597,41 @@ export class CityRuntime {
     return landmarkById[id] ? id : null;
   }
   private down = (event: PointerEvent) => {
+    if (event.pointerType === "touch") {
+      this.touchPointers.add(event.pointerId);
+      if (this.touchPointers.size > 1) {
+        this.dragged = true;
+        return;
+      }
+    }
     this.start = { x: event.clientX, y: event.clientY };
     this.dragged = false;
   };
   private move = (event: PointerEvent) => {
     if (
-      event.buttons &&
+      (event.buttons || event.pointerType === "touch") &&
       Math.hypot(event.clientX - this.start.x, event.clientY - this.start.y) > 5
     )
       this.dragged = true;
-    if (!event.buttons) {
+    if (!event.buttons && event.pointerType !== "touch") {
       const id = this.pick(event.clientX, event.clientY);
       this.renderer.domElement.style.cursor = id ? "pointer" : "grab";
       this.options.onHover(id);
     }
   };
   private up = (event: PointerEvent) => {
-    if (event.button === 0 && !this.dragged) {
+    this.touchPointers.delete(event.pointerId);
+    if (event.button === 0 && !this.dragged && !this.touchPointers.size) {
       const id = this.pick(event.clientX, event.clientY);
       if (id) {
         this.host.dataset.lastPick = id;
         this.options.onSelect(id);
       }
     }
+  };
+  private cancel = (event: PointerEvent) => {
+    this.touchPointers.delete(event.pointerId);
+    this.dragged = true;
   };
   private leave = () => this.options.onHover(null);
   setPaused(value: boolean) {

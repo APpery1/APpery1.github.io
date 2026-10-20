@@ -64,12 +64,16 @@ export function CityArrival({ progress, modelReady, onDone }: Props) {
       doneRef.current();
     };
     const tick = (now: number) => {
-      const target = readyRef.current ? 1 : progressRef.current;
+      const target = readyRef.current ? 1 : Math.min(progressRef.current, 0.95);
       const shown = reduced
         ? target
         : Math.min(1, (now - started) / 2200, Math.max(target, 0.04));
-      car.setAttribute("transform", `translate(${560 + 320 * shown} 480)`);
+      car.setAttribute(
+        "style",
+        `transform:translate(${560 + 320 * shown}px,480px)`,
+      );
       bar.setAttribute("width", String(320 * shown));
+      bar.setAttribute("style", `width:${320 * shown}px`);
       percent.textContent = `${Math.round(shown * 100)}%`;
       if (shown >= 0.995 && readyRef.current) {
         window.setTimeout(finish, reduced ? 0 : 280);
@@ -93,9 +97,6 @@ export function CityArrival({ progress, modelReady, onDone }: Props) {
       aria-busy="true"
     >
       <div className="arrival-stage" ref={stage} />
-      <button type="button" onClick={onDone}>
-        {lang === "zh" ? "跳过" : "Skip"}
-      </button>
     </div>
   );
 }
