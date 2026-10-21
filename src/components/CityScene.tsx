@@ -407,15 +407,11 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
             <div className="city-map-help" id="city-map-help">
               <Icon name="move" size={15} />
               <span>
-                {lang === "zh"
-                  ? "拖动漫游 · 单指旋转 · 双指缩放"
-                  : "Drag to pan · Swipe to rotate · Pinch to zoom"}
+                {lang === "zh" ? "拖动漫游" : "Drag to explore"}
               </span>
               <kbd>H</kbd>
               <span className="map-help-secondary">
-                {lang === "zh"
-                  ? "显示入口 · 中键旋转"
-                  : "Entrances · Middle-drag to rotate"}
+                {lang === "zh" ? "显示入口" : "Entrances"}
               </span>
             </div>
           </>
