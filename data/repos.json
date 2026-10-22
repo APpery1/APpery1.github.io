@@ -1,18 +1,7 @@
 {
-  "generatedAt": "2026-10-21T08:22:45.280Z",
+  "generatedAt": "2026-10-22T00:08:58.949Z",
   "owner": "APpery1",
   "repos": [
-    {
-      "name": "APpery1.github.io",
-      "url": "https://github.com/APpery1/APpery1.github.io",
-      "description": "APpery 的个人网站 · 纯静态，项目列表与 GitHub 同步",
-      "descZh": "",
-      "descEn": "",
-      "language": "HTML",
-      "pushedAt": "2026-10-21T08:22:26Z",
-      "stars": 0,
-      "fork": false
-    },
     {
       "name": "APpery1",
       "url": "https://github.com/APpery1/APpery1",
@@ -20,7 +9,18 @@
       "descZh": "",
       "descEn": "",
       "language": null,
-      "pushedAt": "2026-10-20T08:49:56Z",
+      "pushedAt": "2026-10-21T08:50:07Z",
+      "stars": 0,
+      "fork": false
+    },
+    {
+      "name": "APpery1.github.io",
+      "url": "https://github.com/APpery1/APpery1.github.io",
+      "description": "APpery 的个人网站 · 纯静态，项目列表与 GitHub 同步",
+      "descZh": "",
+      "descEn": "",
+      "language": "HTML",
+      "pushedAt": "2026-10-21T08:23:21Z",
       "stars": 0,
       "fork": false
     },
