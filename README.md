@@ -7,7 +7,7 @@
 - **高架公路**点击「上高架」直接进入原版《鹈鹕竞速》。街角游戏厅仍可使用。
 - **机场**可从右下角定位。点击航站楼切换中英文。
 - **地图操作**：左键拖动、中键旋转、滚轮缩放；手机单指旋转、双指开合缩放。右下角缩放按钮与百分比同步显示当前视角，提供总览、复位和旋转按钮。聚焦地图后可用方向键、加减号与 Home。
-- **首次加载**：小车加载画面没有跳过按钮，显示期间在后台下载并组装城市模型，准备完成后自动进入。同一会话内不重复播放；减少动态效果时保留静态加载提示。
+- **首次加载**：小车加载画面没有跳过按钮，模型从 HTML 阶段就开始预加载，三维引擎并行下载。下载进度由 GLB 文件头的长度计算，兼容 gzip 和缺少 `Content-Length` 的响应；加载完成后还会等待城市首帧实际渲染，再自动进入。同一会话内不重复播放；减少动态效果时保留静态加载提示。本地字体延后到城市出现后加载，避免争抢首屏带宽。
 - **界面**使用与城市相同的松绿和纸色。悬浮导航随时直达七个内容区；中英文与日夜主题保存在本地。
 
 ## 本地运行
@@ -26,7 +26,7 @@ npm run dev
 npm run build        # 类型检查并生成 dist/
 npm run preview      # 预览生成的静态站点
 npm test             # 原独立项目的完整验收（仍引用迁移前的对照目录）
-npm run test:city    # 构建并验证首次加载、缩放按钮和手机触摸手势
+npm run test:city    # 构建并验证首次加载、压缩传输、失败重试、缩放按钮和手机手势
 ```
 
 浏览器验收默认使用本机 Microsoft Edge，可设置 `BROWSER_CHANNEL=chrome`。脚本在 5175 端口启动临时生产预览并在结束后关闭；`npm run test:browser` 单独检查已构建的 dist/。
@@ -54,7 +54,7 @@ npm run test:city    # 构建并验证首次加载、缩放按钮和手机触摸
 - 研究：`src/content/research.md`；技术文档：`document/分类名/`。新分类自动扫描，支持空分类。
 - 照片：`photo/`；缩略图与预览图分别位于 `.thumbs/` 和 `.full/`。
 - 内容建筑：`src/components/CityScene.tsx`；名称与导航：`src/lib/places.ts`。
-- 三维城市：`src/components/city/CityRuntime.ts`；建筑入口坐标：`ModelLandmarks.ts`；源模型：`blender/city_model.blend`。
+- 三维城市：`src/components/city/CityRuntime.ts`；模型下载和缓存：`CityAsset.ts`；建筑入口坐标：`ModelLandmarks.ts`；源模型：`blender/city_model.blend`。
 - 重新导出模型：`scripts/export-city.py`，再运行 `node scripts/prepare-city.mjs`。
 - 页面样式：`src/styles.css`；全屏城市与悬浮工具：`src/city.css`。
 - 小游戏：`public/game/game.html`，保持原文件完整。

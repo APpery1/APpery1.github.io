@@ -14,6 +14,7 @@ import {
   type CityDestination,
 } from "./city/ModelLandmarks";
 import type { CityRuntime, ScreenPoint } from "./city/CityRuntime";
+import { loadCityBytes } from "./city/CityAsset";
 type Props = {
   onEnter: (id: PlaceId) => void;
   onPlayRace: () => void;
@@ -63,6 +64,9 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
       let cancelled = false;
       setFailure(false);
       setReady(false);
+      void loadCityBytes((value) => {
+        if (!cancelled) callbacks.current.onLoadProgress(0.05 + value * 0.75);
+      }).catch(() => {});
       void import("./city/CityRuntime")
         .then(({ CityRuntime }) => {
           if (cancelled || !host.current) return;
@@ -406,9 +410,7 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
             </div>
             <div className="city-map-help" id="city-map-help">
               <Icon name="move" size={15} />
-              <span>
-                {lang === "zh" ? "拖动漫游" : "Drag to explore"}
-              </span>
+              <span>{lang === "zh" ? "拖动漫游" : "Drag to explore"}</span>
               <kbd>H</kbd>
               <span className="map-help-secondary">
                 {lang === "zh" ? "显示入口" : "Entrances"}

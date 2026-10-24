@@ -29,6 +29,7 @@ export function CityArrival({ progress, modelReady, onDone }: Props) {
     const svg = root.querySelector("svg");
     const car = root.getElementById("car-position");
     const bar = root.getElementById("progress");
+    const status = root.getElementById("status");
     const percent = root.getElementById("percentage");
     if (!svg || !car || !bar || !percent) {
       doneRef.current();
@@ -63,20 +64,42 @@ export function CityArrival({ progress, modelReady, onDone }: Props) {
       cancelAnimationFrame(frame);
       doneRef.current();
     };
+    let lastTick = started;
+    let shown = 0;
     const tick = (now: number) => {
       const target = readyRef.current ? 1 : Math.min(progressRef.current, 0.95);
-      const shown = reduced
+      const elapsed = now - lastTick;
+      lastTick = now;
+      shown = reduced
         ? target
-        : Math.min(1, (now - started) / 2200, Math.max(target, 0.04));
+        : Math.max(
+            shown,
+            shown + (target - shown) * (1 - Math.exp(-elapsed / 100)),
+          );
+      if (readyRef.current && shown >= 0.99) shown = 1;
+      const message = readyRef.current
+        ? lang === "zh"
+          ? "欢迎抵达 APpery 小镇"
+          : "Welcome to APpery town"
+        : progressRef.current >= 0.8
+          ? lang === "zh"
+            ? "正在准备城市画面…"
+            : "Preparing the city view…"
+          : lang === "zh"
+            ? "正在加载沿途风景…"
+            : "Loading the scenery…";
+      if (status && status.textContent !== message)
+        status.textContent = message;
       car.setAttribute(
         "style",
         `transform:translate(${560 + 320 * shown}px,480px)`,
       );
       bar.setAttribute("width", String(320 * shown));
       bar.setAttribute("style", `width:${320 * shown}px`);
-      percent.textContent = `${Math.round(shown * 100)}%`;
+      const percentage = `${Math.round(shown * 100)}%`;
+      if (percent.textContent !== percentage) percent.textContent = percentage;
       if (shown >= 0.995 && readyRef.current) {
-        window.setTimeout(finish, reduced ? 0 : 280);
+        window.setTimeout(finish, reduced ? 0 : 100);
         return;
       }
       frame = requestAnimationFrame(tick);

@@ -1,10 +1,14 @@
 # Blender 城市验收记录
 
-使用 Node.js 24、本机 Microsoft Edge 无头浏览器、Playwright 与 Axe，检查 Vite 生产构建。运行 `npm test` 复验。原始结果为 `evidence/verification.json`。
+使用 Node.js 24、本机 Microsoft Edge 无头浏览器、Playwright 与 Axe，检查 Vite 生产构建。当前加载和控制专项运行 `npm run test:city` 复验，结果位于 `evidence/city-interactions.json` 与 `evidence/city-loading-verification.json`。原独立 NEW 项目的完整验收脚本 `npm test` 仍引用迁移前的对照目录，其历史结果位于 `evidence/verification.json`。
 
 ## 结果
 
-**93 项检查通过，10 次 WCAG A / AA 自动检查无报告违规，浏览器未捕获异常为 0。**
+**本轮 14 项加载与控制专项检查通过，浏览器未捕获异常为 0。** 包括不可跳过、模型提前下载、gzip 分块且无 Content-Length 的进度、重复请求检查、延后字体、首帧后进入、失败重试、桌面缩放和手机手势。加载屏 WCAG A / AA 自动检查无报告违规。
+
+在本地生产构建与 gzip 服务、冷缓存、1.6 Mbps 下行、150 ms 延迟和 CPU 4 倍减速的同等条件下，优化前后各测 2 次：进入城市平均从 **6,088 ms 降至 4,307 ms（减少 29%）**，模型平均开始下载时间从 3,199 ms 提前到 192 ms。没有更换模型或降低几何精度。数据位于 `evidence/loading-comparison.json`；这组模拟结果不代表实体手机或 GitHub Pages 的固定耗时。
+
+历史独立项目完整验收曾通过 94 项检查和 10 次 WCAG A / AA 自动检查。以下内容与模型条目包含该历史覆盖范围。
 
 ## 模型与操作
 
@@ -13,7 +17,7 @@
 - 七个内容入口、高架和机场都绑定模型中的实际对象。点击模型或入口标记均可进入。
 - 左键拖动平移，滚轮、按钮和键盘缩放，方向键平移，Home 复位。按住鼠标中键旋转视角；右键拖动不旋转。
 - 总览、沉浸模式、机场定位、动画暂停和减少动态偏好均在真实浏览器中检查。
-- 手机触摸拖动和双指缩放不会误入建筑。
+- 手机单指滑动旋转，双指拨开放大、聚拢缩小，手势结束不会误入建筑。
 
 ## 内容与原有功能
 

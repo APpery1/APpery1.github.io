@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useI18n } from "./i18n/LanguageContext";
 import { places, parseRoute, type PlaceId } from "./lib/places";
+import { loadSiteFonts } from "./lib/fonts";
 import { CityScene, type CitySceneHandle } from "./components/CityScene";
 import { CityArrival } from "./components/CityArrival";
 import { Icon } from "./components/Icon";
@@ -209,6 +210,9 @@ export default function App() {
   };
   const activePlace = places.find((p) => p.id === route.place);
   const arrivalActive = !arrived && !inside;
+  useEffect(() => {
+    if (!arrivalActive) void loadSiteFonts();
+  }, [arrivalActive]);
   return (
     <div
       className={`app ${inside ? "is-inside" : "is-outside"} ${entering ? "is-entering" : ""} ${returning ? "is-returning" : ""} ${mapQuiet ? "is-map-quiet" : ""}`}

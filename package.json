@@ -10,7 +10,7 @@
     "snapshot": "node scripts/fetch-repos.mjs",
     "test": "npm run build && node scripts/verify.mjs",
     "test:browser": "node scripts/verify.mjs",
-    "test:city": "npm run build && node scripts/verify-city-interactions.mjs",
+    "test:city": "npm run build && node scripts/verify-city-interactions.mjs && node scripts/verify-city-loading.mjs",
     "format": "prettier --write src vite.config.ts"
   },
   "dependencies": {

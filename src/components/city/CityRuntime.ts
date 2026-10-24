@@ -2,34 +2,36 @@ import * as THREE from "three";
 import { MapControls } from "three/addons/controls/MapControls.js";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { loadCityBytes } from "./CityAsset";
 import {
   landmarks,
   landmarkById,
   type CityDestination,
   type XYZ,
 } from "./ModelLandmarks";
-const assetUrl = `${import.meta.env.BASE_URL}models/city.glb`;
 let asset: Promise<GLTF> | undefined;
-const loadAsset = (onProgress?: (value: number) => void) => {
-  if (asset) {
-    onProgress?.(1);
-    return asset;
-  }
-  asset = new Promise((resolve, reject) => {
-    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(
-      assetUrl,
-      resolve,
-      (event) => {
-        if (event.lengthComputable && event.total)
-          onProgress?.(Math.min(1, event.loaded / event.total));
-      },
-      (error) => {
+const loadAsset = async (onProgress?: (value: number) => void) => {
+  const bytes = await loadCityBytes((value) =>
+    onProgress?.(0.05 + value * 0.75),
+  );
+  onProgress?.(0.82);
+  if (!asset) {
+    performance.mark("city-decode-start");
+    asset = new GLTFLoader()
+      .setMeshoptDecoder(MeshoptDecoder)
+      .parseAsync(bytes, `${import.meta.env.BASE_URL}models/`)
+      .then((gltf) => {
+        performance.mark("city-decode-end");
+        return gltf;
+      })
+      .catch((error: unknown) => {
         asset = undefined;
-        reject(error instanceof Error ? error : new Error(String(error)));
-      },
-    );
-  });
-  return asset;
+        throw error;
+      });
+  }
+  const gltf = await asset;
+  onProgress?.(0.9);
+  return gltf;
 };
 let saved:
   | {
@@ -76,6 +78,7 @@ export class CityRuntime {
   viewHeight = 140;
   mode = "explore";
   ready = false;
+  private presented = false;
   disposed = false;
   paused = false;
   night = false;
@@ -293,13 +296,13 @@ export class CityRuntime {
       }
       this.applyTheme();
       this.ready = true;
-      this.host.dataset.modelLoaded = "true";
+      performance.mark("city-scene-ready");
       this.host.dataset.modelSource = "blender/city_model.blend";
       this.host.dataset.animationClips = String(gltf.animations.length);
       this.host.dataset.sourceMeshes = String(this.hits.length);
       this.renderer.shadowMap.needsUpdate = true;
       this.dirty = true;
-      this.options.onReady();
+      this.options.onProgress?.(0.95);
     } catch (error) {
       if (!this.disposed)
         this.options.onError(
@@ -404,6 +407,13 @@ export class CityRuntime {
     }
     this.camera.updateMatrixWorld();
     this.renderer.render(this.scene, this.camera);
+    if (this.ready && !this.presented) {
+      this.presented = true;
+      this.host.dataset.modelLoaded = "true";
+      performance.mark("city-first-frame");
+      this.options.onProgress?.(1);
+      this.options.onReady();
+    }
     for (const l of landmarks)
       this.options.onProject(
         l.id,
