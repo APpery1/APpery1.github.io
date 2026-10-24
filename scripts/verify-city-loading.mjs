@@ -154,7 +154,8 @@ try {
     });
     expect(startsEarly).toBe(true);
     expect(timings.arrived).toBeGreaterThanOrEqual(timings.firstFrame);
-    expect(timings.arrived - timings.firstFrame).toBeLessThan(1000);
+    // The letter journey runs for 12 seconds, then reveals the rendered city.
+    expect(timings.arrived - timings.firstFrame).toBeLessThan(15000);
     check(
       `${name}: 压缩分块响应无 Content-Length 时进度仍前进，模型仅请求一次、早于主脚本完成启动，字体延后且首帧完成后进入`,
     );
@@ -173,7 +174,9 @@ try {
   await expect(page.getByRole("button", { name: "重新加载" })).toBeVisible({
     timeout: 15000,
   });
-  await expect(page.locator('[data-arrival="done"]')).toBeVisible();
+  await expect(page.locator('[data-arrival="done"]')).toBeVisible({
+    timeout: 15000,
+  });
   await expect(page.locator(".model-city")).not.toHaveAttribute(
     "data-model-loaded",
     "true",

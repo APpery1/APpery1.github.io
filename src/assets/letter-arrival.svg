@@ -1,0 +1,35 @@
+<svg id="arrival-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" role="img" aria-labelledby="title desc">
+<title id="title">寄往小城的一封信</title><desc id="desc">一封信化作纸飞机，飞过层叠云海与远山，最后信纸铺满画面。</desc>
+<defs>
+ <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900"><stop stop-color="#cbdedb"/><stop offset=".55" stop-color="#edf0de"/><stop offset="1" stop-color="#f8eed9"/></linearGradient>
+ <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#fffdf1"/><stop offset="1" stop-color="#e8dec2"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#fff9df" stop-opacity=".9"/><stop offset="1" stop-color="#fff9df" stop-opacity="0"/></radialGradient>
+ <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 8 8 0" stroke="#fff9e6" stroke-opacity=".16" stroke-width="1"/></pattern>
+ <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
+ <g id="cloud"><path d="M-175 22c-24-10-9-31 13-29-15-37 41-65 66-38 16-49 83-41 91 1 31-18 65-4 65 24 47-12 72 27 37 40Z" fill="#fcf9eb"/><path d="M-163 23h255" stroke="#dbe5d9" stroke-width="2" stroke-linecap="round"/></g>
+ <g id="bird" fill="none" stroke="#6f8d85" stroke-width="2" stroke-linecap="round"><path d="M-12 2q7-8 12 0 5-8 12-1"/></g>
+</defs>
+<path fill="url(#sky)" d="M-2000-2000h5440v4900H-2000z"/>
+<circle cx="1000" cy="260" r="310" fill="url(#glow)"/>
+<g id="sun"><circle cx="1000" cy="260" r="67" fill="#f5dfaa"/><circle cx="1000" cy="260" r="83" fill="none" stroke="#f5e8c7"/><circle cx="1000" cy="260" r="104" fill="none" stroke="#eff0d9"/></g>
+<g id="far-clouds" opacity=".65"><use href="#cloud" transform="translate(350 260) scale(1.2)"/><use href="#cloud" transform="translate(1210 365) scale(.85)"/><use href="#cloud" transform="translate(750 170) scale(.5)"/></g>
+<path d="M0 580q180-125 360-30t350-40 360 22 370-50L1440 2200H0Z" fill="#b6cbbc" opacity=".24"/>
+<path d="M0 660q240-120 460-5t470-60 510 10L1440 2200H0Z" fill="#9fbfb0" opacity=".19"/>
+<g id="birds"><use href="#bird" transform="translate(1080 400)"/><use href="#bird" transform="translate(1110 384) scale(.7)"/><use href="#bird" transform="translate(1137 400) scale(.5)"/></g>
+<g id="front-clouds"><use href="#cloud" transform="translate(310 680) scale(1.5)"/><use href="#cloud" transform="translate(1150 725) scale(1.8)"/><use href="#cloud" transform="translate(730 810) scale(1.2)"/></g>
+<path id="trail" d="M720 410C170 25 1220 510 1040 190" fill="none" stroke="#fff8e2" stroke-width="2" stroke-dasharray="5 8" stroke-linecap="round"/>
+<g id="envelope" transform="translate(720 430)">
+ <ellipse cy="90" rx="90" ry="12" fill="#769681" opacity=".13" filter="url(#shadow)"/>
+ <path d="M-100-32 0-103 100-32v116H-100Z" fill="#d8ccb0" stroke="#c5c4a7"/>
+ <g id="letter"><rect x="-83" y="-64" width="166" height="112" rx="3" fill="#fffcef" stroke="#d5cfb5"/><path d="M-57-35H35m-92 13H57m-114 13H15" stroke="#b3c3af" stroke-width="2"/><path d="m40 8 12-7 12 7v16l-12 7-12-7Z" fill="#a5bfab"/><path d="m40 8 12 7 12-7m-12 7v16" fill="none" stroke="#648c7e"/></g>
+ <path d="M-100-32 0 34 100-32V84H-100Z" fill="url(#paper)" stroke="#c5c4a7"/>
+ <path d="M-100 84 0 12 100 84" fill="#f7efda" stroke="#d2cbb1"/>
+ <circle cy="30" r="15" fill="#bc8068"/><circle cy="30" r="11" fill="none" stroke="#e5b49a"/><path d="m-6 30 5 4 8-9" fill="none" stroke="#f5dcc0" stroke-width="1.5"/>
+</g>
+<g id="plane"><g id="plane-shape"><path d="m-60-27 120 21-86 15Z" fill="#fffdf0" stroke="#cfceb4"/><path d="m-26 9 86-15-106 2Z" fill="#aec2b3"/><path d="m-46-4 106-2-71 38Z" fill="#ede7cd" stroke="#c4c9ac"/><path d="m-26 9 15 23 5-19Z" fill="#91aa9e"/><path d="m-60-27 120 21-106 2" fill="none" stroke="#fffef7" stroke-width="1.4"/></g></g>
+<g id="copy" text-anchor="middle"><text x="720" y="210" class="eyebrow">A LETTER TO SOMEWHERE QUIET</text><text x="720" y="266" class="heading">寄往小城的一封信</text><text x="720" y="307" class="subtitle">让风替你带路，让美好慢慢抵达。</text></g>
+<g id="destination" text-anchor="middle"><text x="720" y="222" class="eyebrow">YOU HAVE ARRIVED</text><text x="720" y="277" class="heading">风的下一站，是这里。</text><text x="720" y="318" class="subtitle">APpery · 每个想法，都有一扇亮着的窗</text></g>
+<g id="wipe"><path d="M-1000-1000H1000V1000H-1000Z" fill="#f6f1df"/><path id="crease" d="M-1000-1000 1000 1000" stroke="#ded9bd" stroke-width="3"/></g>
+
+<g class="brand"><path d="m58 55 12-7 12 7v14l-12 7-12-7Z" fill="#85a893"/><text x="95" y="71">APpery.</text><text x="1380" y="68" text-anchor="end" class="edition">风物来信 / 01</text></g>
+</svg>
