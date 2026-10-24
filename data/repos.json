@@ -1,18 +1,7 @@
 {
-  "generatedAt": "2026-10-23T23:57:10.833Z",
+  "generatedAt": "2026-10-24T11:16:38.431Z",
   "owner": "APpery1",
   "repos": [
-    {
-      "name": "APpery1",
-      "url": "https://github.com/APpery1/APpery1",
-      "description": "",
-      "descZh": "",
-      "descEn": "",
-      "language": null,
-      "pushedAt": "2026-10-23T08:47:41Z",
-      "stars": 0,
-      "fork": false
-    },
     {
       "name": "APpery1.github.io",
       "url": "https://github.com/APpery1/APpery1.github.io",
@@ -20,7 +9,18 @@
       "descZh": "",
       "descEn": "",
       "language": "HTML",
-      "pushedAt": "2026-10-23T00:06:56Z",
+      "pushedAt": "2026-10-24T11:16:25Z",
+      "stars": 0,
+      "fork": false
+    },
+    {
+      "name": "APpery1",
+      "url": "https://github.com/APpery1/APpery1",
+      "description": "",
+      "descZh": "",
+      "descEn": "",
+      "language": null,
+      "pushedAt": "2026-10-24T08:21:56Z",
       "stars": 0,
       "fork": false
     },
