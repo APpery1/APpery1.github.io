@@ -1,0 +1,165 @@
+/* The paper tip is the exact hotspot; only the surrounding marks transition. */
+.town-cursor {
+  --cursor-edge: #315a45;
+  --cursor-paper: #fff9e6;
+  --cursor-fold: #93b38d;
+  --cursor-accent: #d18564;
+  --cursor-rim: #fffbee;
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  pointer-events: none;
+  visibility: hidden;
+  transform: translate3d(-100px, -100px, 0);
+  z-index: 2147483647;
+  contain: layout style;
+}
+.town-cursor::backdrop {
+  background: transparent;
+  pointer-events: none;
+}
+.town-cursor[data-visible="true"] {
+  visibility: visible;
+}
+.town-cursor-mark {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  transform-origin: 4px 3px;
+  transition: transform 130ms ease-out;
+}
+.town-cursor-paper {
+  position: absolute;
+  inset: 0;
+  width: 38px;
+  height: 38px;
+  overflow: visible;
+  filter: drop-shadow(0 1px 0 var(--cursor-rim))
+    drop-shadow(1px 3px 2px #183d3430);
+  transform-origin: 4px 3px;
+  transition:
+    transform 150ms ease-out,
+    opacity 100ms;
+}
+.cursor-paper-base {
+  fill: var(--cursor-paper);
+  stroke: var(--cursor-edge);
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+}
+.cursor-paper-fold {
+  fill: var(--cursor-fold);
+}
+.cursor-paper-crease {
+  stroke: var(--cursor-edge);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.town-cursor-halo {
+  position: absolute;
+  left: -5px;
+  top: -4px;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid var(--cursor-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff9e64d;
+  opacity: 0;
+  transform: scale(0.65);
+  transition:
+    transform 180ms ease-out,
+    opacity 120ms;
+}
+.town-cursor-compass {
+  position: absolute;
+  left: -20px;
+  top: -21px;
+  width: 48px;
+  height: 48px;
+  opacity: 0;
+  stroke: var(--cursor-edge);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px var(--cursor-rim));
+  transition:
+    opacity 120ms,
+    transform 180ms ease-out;
+}
+.cursor-compass-ring {
+  stroke: var(--cursor-edge);
+  stroke-width: 0.85;
+  opacity: 0.45;
+}
+.cursor-compass-ticks {
+  opacity: 0.7;
+}
+.cursor-compass-move,
+.cursor-compass-orbit {
+  opacity: 0;
+}
+.town-cursor[data-mode="link"] .town-cursor-halo {
+  opacity: 0.85;
+  transform: scale(1);
+}
+.town-cursor[data-mode="link"] .town-cursor-paper {
+  transform: rotate(-8deg) scale(1.04);
+}
+.town-cursor[data-mode="pan"] .town-cursor-compass {
+  opacity: 0.55;
+}
+.town-cursor[data-mode="drag"] .town-cursor-paper,
+.town-cursor[data-mode="rotate"] .town-cursor-paper {
+  opacity: 0;
+  transform: scale(0.65);
+}
+.town-cursor[data-mode="drag"] .town-cursor-compass,
+.town-cursor[data-mode="rotate"] .town-cursor-compass,
+.town-cursor[data-mode="drag"] .cursor-compass-move,
+.town-cursor[data-mode="rotate"] .cursor-compass-orbit {
+  opacity: 1;
+}
+.town-cursor[data-mode="rotate"] .cursor-compass-ring,
+.town-cursor[data-mode="rotate"] .cursor-compass-ticks {
+  opacity: 0;
+}
+.town-cursor[data-mode="rotate"] .town-cursor-compass {
+  stroke: var(--cursor-accent);
+  transform: rotate(20deg);
+}
+.town-cursor[data-pressed="true"][data-mode="link"] .town-cursor-mark,
+.town-cursor[data-pressed="true"][data-mode="roam"] .town-cursor-mark {
+  transform: scale(0.88);
+}
+[data-theme="night"] .town-cursor {
+  --cursor-edge: #d3e7c7;
+  --cursor-paper: #eff5dc;
+  --cursor-fold: #6e997b;
+  --cursor-accent: #f0b18a;
+  --cursor-rim: #1b342e;
+}
+@media (any-pointer: fine) and (any-hover: hover) and (forced-colors: none) {
+  html.has-town-cursor,
+  html.has-town-cursor * {
+    cursor: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .town-cursor *,
+  .town-cursor *::before,
+  .town-cursor *::after {
+    transition: none !important;
+  }
+}
+@media (forced-colors: active), (any-hover: none) {
+  .town-cursor {
+    display: none !important;
+  }
+}
