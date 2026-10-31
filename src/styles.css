@@ -1711,8 +1711,8 @@ html[lang="en"] .english-break {
   z-index: 40;
   display: grid;
   place-items: center;
-  background: #101a22;
-  color: #f1d292;
+  background: #f6f4e8;
+  color: #294536;
   pointer-events: none;
 }
 .race-veil p {
@@ -1736,7 +1736,7 @@ html[lang="en"] .english-break {
   top: -20%;
   width: 7px;
   height: 150%;
-  background: repeating-linear-gradient(#efe0b4 0 16px, transparent 16px 34px);
+  background: repeating-linear-gradient(#d18564 0 16px, transparent 16px 34px);
 }
 .race-road i { left: 18%; }
 .race-road b { left: calc(50% - 3px); }
@@ -1754,7 +1754,8 @@ html[lang="en"] .english-break {
   inset: 8px 6px auto;
   height: 16px;
   border-radius: 8px 10px 3px 3px;
-  background: #f4efe0;
+  background: #fffdf3;
+  border: 1px solid #b9c9b2;
 }
 .race-car span:before {
   content: "";
@@ -1764,7 +1765,7 @@ html[lang="en"] .english-break {
   width: 22px;
   height: 8px;
   border-radius: 3px;
-  background: #3d8eb0;
+  background: #739d84;
 }
 .race-car span:after {
   content: "";
@@ -1774,7 +1775,7 @@ html[lang="en"] .english-break {
   width: 16px;
   height: 8px;
   border-radius: 8px 8px 2px 2px;
-  background: #f0b15a;
+  background: #d18564;
 }
 .race-car u {
   position: absolute;
@@ -1782,7 +1783,7 @@ html[lang="en"] .english-break {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #243028;
+  background: #294536;
 }
 .race-car u:first-of-type { left: 10px; }
 .race-car u:last-of-type { right: 10px; }
