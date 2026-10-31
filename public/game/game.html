@@ -76,10 +76,133 @@
       #mobile-state{position:absolute;left:180px;right:200px;bottom:15px;margin:0;font-size:10px;text-shadow:0 1px 4px #000}.mobile-tip{display:none}
     }
     @media(orientation:landscape) and (max-height:360px){.mobile-hud{padding-top:5px}.quiet-button{height:36px}#mobile-weather-drawer{top:54px;padding:9px}.weather-choice{min-height:38px}#mobile-weather-detail{margin-top:7px}.weather-drawer-heading{margin-bottom:2px}.touch-deck{padding-bottom:8px}.drive-button{min-height:53px}#mobile-throttle{min-height:65px}}
+
+    /* APpery town UI: quiet paper controls over the fast night road. */
+    :root {
+      --town-paper: #fffdf3;
+      --town-paper-soft: #f1f3e4;
+      --town-ink: #294536;
+      --town-muted: #4a6154;
+      --town-line: #c5d1bd;
+      --town-green: #4f7d58;
+      --town-coral: #d18564;
+      --town-shadow: 0 8px 24px #203d2b2b;
+    }
+    html, body { background: #dfe8d9; color: var(--town-ink); }
+    #mobile-app {
+      background: linear-gradient(180deg, #dce8dc 0%, #f6f4e8 100%);
+    }
+    .mobile-hud {
+      min-height: 76px;
+      padding: 12px 18px 9px;
+      background: linear-gradient(180deg, #fffdf3f2, #fffdf3d9);
+      border-bottom: 1px solid #bdcdb9;
+      box-shadow: 0 5px 22px #29453618;
+    }
+    .speed-readout {
+      padding: 8px 13px;
+      border: 1px solid var(--town-line);
+      border-radius: 11px;
+      background: var(--town-paper);
+      box-shadow: var(--town-shadow);
+      color: var(--town-ink);
+    }
+    #mobile-speed { color: var(--town-ink); font-size: 42px; }
+    .speed-meta { color: var(--town-muted); }
+    #mobile-lanes i { background: #c8d4c2; }
+    #mobile-lanes i.selected { background: var(--town-coral); }
+    .game-brand {
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transform: translateX(-50%);
+      min-width: 142px;
+      padding: 7px 12px;
+      border: 1px solid var(--town-line);
+      border-radius: 11px;
+      background: #fffdf3ed;
+      box-shadow: var(--town-shadow);
+      color: var(--town-ink);
+      pointer-events: none;
+    }
+    .game-brand-mark { width: 14px; height: 14px; transform: rotate(30deg); border-radius: 3px; background: var(--town-green); box-shadow: 4px 4px 0 #9dbb92; }
+    .game-brand-copy { display: flex; flex-direction: column; gap: 1px; line-height: 1; }
+    .game-brand-copy strong { font-size: 13px; letter-spacing: -.3px; }
+    .game-brand-copy small { color: var(--town-muted); font-size: 8px; letter-spacing: 1.5px; }
+    .hud-actions { gap: 6px; }
+    .site-back, .quiet-button {
+      min-width: 40px;
+      min-height: 40px;
+      border: 1px solid var(--town-line);
+      border-radius: 10px;
+      background: var(--town-paper);
+      box-shadow: 0 4px 12px #29453620;
+      color: var(--town-ink);
+    }
+    .site-back:hover, .quiet-button:hover, .quiet-button[aria-expanded="true"] { background: #e5eddd; color: var(--town-green); }
+    .site-back:focus-visible, .quiet-button:focus-visible, .drive-button:focus-visible { outline: 3px solid var(--town-coral); outline-offset: 3px; }
+    #mobile-weather-toggle { min-width: 88px; }
+    #mobile-transition-track { background: var(--town-coral); }
+    #mobile-weather-drawer {
+      top: 76px;
+      padding: 16px;
+      border: 1px solid var(--town-line);
+      border-radius: 14px;
+      background: #fffdf3f5;
+      box-shadow: 0 16px 45px #29453632;
+      color: var(--town-ink);
+      backdrop-filter: blur(12px);
+    }
+    .weather-drawer-heading { color: var(--town-ink); }
+    .weather-drawer-heading button { color: var(--town-muted); }
+    .weather-choice { border-color: var(--town-line); background: var(--town-paper-soft); color: var(--town-muted); }
+    .weather-choice:hover, .weather-choice[aria-pressed="true"] { border-color: var(--town-green); background: #dce9d9; color: var(--town-ink); }
+    #mobile-weather-detail, #mobile-state, .mobile-tip { color: var(--town-muted); }
+    .touch-deck {
+      padding: 9px 18px 13px;
+      background: #fffdf3e8;
+      border-top: 1px solid var(--town-line);
+      box-shadow: 0 -7px 24px #29453618;
+    }
+    .drive-button {
+      min-height: 70px;
+      border: 1px solid var(--town-line);
+      border-radius: 14px;
+      background: var(--town-paper);
+      box-shadow: 0 4px 0 #aec3aa, 0 8px 15px #29453618;
+      color: var(--town-ink);
+    }
+    .drive-button .glyph { color: var(--town-green); }
+    .drive-button .label { color: var(--town-muted); letter-spacing: .8px; }
+    .drive-button.pressed { background: #dce9d9; border-color: var(--town-green); box-shadow: 0 1px 0 #aec3aa, 0 4px 10px #29453616; }
+    #mobile-brake { background: #fae9df; border-color: #dfb7a4; }
+    #mobile-brake .glyph, #mobile-brake .label { color: #a85745; }
+    #mobile-brake.pressed { background: #f3d5c8; border-color: var(--town-coral); }
+    #mobile-throttle { background: #dce9d9; border-color: #a9c5a4; }
+    #mobile-throttle .glyph, #mobile-throttle .label { color: var(--town-green); }
+    #mobile-throttle.pressed { background: #c7dec5; border-color: var(--town-green); }
+    #mobile-app.fast #mobile-speed { color: var(--town-coral); }
+    @media(max-width:500px) {
+      .game-brand { display: none; }
+      .game-brand-copy small { display: none; }
+      .game-brand-copy strong { font-size: 12px; }
+      .mobile-hud { padding-inline: 11px; }
+      .speed-readout { padding-inline: 10px; }
+      #mobile-speed { font-size: 38px; }
+      .touch-deck { padding-inline: 12px; }
+    }
   </style>
 </head>
 <body>
 <main id="mobile-app">
+  <div class="game-brand" aria-label="APpery 鹈鹕竞速">
+    <span class="game-brand-mark" aria-hidden="true"></span>
+    <span class="game-brand-copy"><strong>APpery.</strong><small>鹈鹕竞速</small></span>
+  </div>
   <header class="mobile-hud" aria-label="车速与比赛操作">
     <div class="speed-readout" aria-label="实时车速"><output id="mobile-speed">60</output><div class="speed-meta"><span>KM/H</span><div id="mobile-lanes" aria-label="第3车道"><i></i><i></i><i class="selected"></i><i></i></div></div></div>
     <div class="hud-actions">
@@ -406,21 +529,27 @@
       </g>
     </g>
     <style>
-      .line { stroke: #081b23; stroke-linecap: round; stroke-linejoin: round; }
+      .line { stroke: #294536; stroke-linecap: round; stroke-linejoin: round; }
       .round { stroke-linecap: round; stroke-linejoin: round; }
       :root:focus-visible { outline: none; }
-      :root:focus-visible #speed-panel { stroke: #e0ca91; }
+      :root:focus-visible #speed-panel { stroke: #d18564; stroke-width: 2; }
       .opponent-spokes { transform-box: fill-box; transform-origin: center; animation: rival-roll var(--wheel-duration, 1.3s) linear infinite; }
       @keyframes rival-roll { to { transform: rotate(360deg); } }
-      #speed-hud { font-family: 'Consolas', 'DejaVu Sans Mono', monospace; pointer-events: none; }
-      #weather-control { font-family: 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif; }
+      #speed-hud { font-family: 'Town Sans', 'Microsoft YaHei', sans-serif; pointer-events: none; }
+      #weather-control { font-family: 'Town Sans', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif; }
+      #weather-panel > rect, #speed-panel { fill: #fffdf3; fill-opacity: .94; stroke: #b9c9b2; stroke-opacity: .98; }
+      #weather-panel > text, #speed-hud text { fill: #4a6154; }
+      #weather-current, #speed-value { fill: #294536 !important; }
+      #speed-bar { fill: #d18564; }
+      #lane-indicators { fill: #4f7d58; }
+      #weather-transition-bar { fill: #d18564; }
       .weather-button { cursor: pointer; outline: none; }
-      .weather-button rect { fill: #243842; fill-opacity: .7; stroke: #67828b; stroke-opacity: .35; }
-      .weather-button text { fill: #b9cbd0; pointer-events: none; }
-      .weather-button:hover rect { fill: #3d5961; stroke-opacity: 1; }
-      .weather-button[aria-pressed="true"] rect { fill: #577f79; stroke: #a0d4c2; stroke-opacity: 1; }
-      .weather-button[aria-pressed="true"] text { fill: #f1f6e9; }
-      .weather-button:focus-visible rect { stroke: #fff0b7; stroke-width: 2; stroke-opacity: 1; }
+      .weather-button rect { fill: #eef1e2; fill-opacity: 1; stroke: #c5d1bd; stroke-opacity: 1; }
+      .weather-button text { fill: #4a6154; pointer-events: none; }
+      .weather-button:hover rect { fill: #e1eadb; stroke: #739d84; stroke-opacity: 1; }
+      .weather-button[aria-pressed="true"] rect { fill: #dce9d9; stroke: #4f7d58; stroke-opacity: 1; }
+      .weather-button[aria-pressed="true"] text { fill: #294536; }
+      .weather-button:focus-visible rect { stroke: #d18564; stroke-width: 2; stroke-opacity: 1; }
       .snow-cover { opacity: var(--snow-cover, 0); pointer-events: none; }
       [data-glass] > use { opacity: var(--interior-light, .78); }
       .lamp-light { opacity: var(--lamp-light, 1); }

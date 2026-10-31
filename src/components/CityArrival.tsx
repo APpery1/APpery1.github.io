@@ -162,13 +162,11 @@ export function CityArrival({ progress, modelReady, onDone }: Props) {
       opacity("#crease", [1, 0], 10400, 500);
     };
     const fit = () => {
-      const w = host.clientWidth,
-        h = host.clientHeight;
-      const height = (860 * h) / Math.max(w, 1);
-      svg.setAttribute(
-        "viewBox",
-        w < 650 ? `290 ${450 - height / 2} 860 ${height}` : "0 0 1440 900",
-      );
+      // Keep one wide artboard and crop it with `slice`. Expanding the mobile
+      // viewBox to match portrait height made the letter and horizon tiny,
+      // leaving the opening composition visually empty.
+      svg.setAttribute("viewBox", "0 0 1440 900");
+      svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
     };
     const resize = new ResizeObserver(fit);
     resize.observe(host);
