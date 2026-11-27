@@ -1,3 +1,21 @@
+/* The town clock shares the header strip with the map guide. */
+.city-time-control {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 5px;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.city-time-control select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+.city-time-control:focus-within { outline: 2px solid currentColor; outline-offset: -2px; }
+[data-theme="night"] .city-time-control { color: #f4ead4; }
+@media (max-width: 420px) { .city-time-control svg { display: none; } }
 /* Blender city: full-screen rendering and unobtrusive map controls. */
 .sr-only {
   position: absolute;

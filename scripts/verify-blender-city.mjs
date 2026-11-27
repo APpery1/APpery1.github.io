@@ -12,7 +12,7 @@ export async function verifyBlenderModel(check) {
   );
   check(
     "使用指定 Blender 源文件且源文件未被导出流程改写",
-    manifest.source === "blender/city_model.blend" &&
+    manifest.source === "blender/city-v2.blend" && manifest.duration === 600 && manifest.fps === 24 &&
       manifest.sourceUnchanged &&
       hash(manifest.source) === manifest.sourceSha256,
   );

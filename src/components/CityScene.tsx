@@ -19,6 +19,7 @@ type Props = {
   onEnter: (id: PlaceId) => void;
   onPlayRace: () => void;
   night: boolean;
+  hour: number;
   onToggleLanguage: () => void;
   onQuietChange: (quiet: boolean) => void;
   onCityReady: () => void;
@@ -103,7 +104,7 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
               onView: setZoom,
             });
             runtime.current = engine;
-            engine.setNight(callbacks.current.night);
+            engine.setHour(callbacks.current.hour);
           } catch {
             setFailure(true);
             callbacks.current.onCityReady();
@@ -120,8 +121,8 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(
       };
     }, [retry]);
     useEffect(
-      () => runtime.current?.setNight(props.night),
-      [props.night, ready],
+      () => runtime.current?.setHour(props.hour),
+      [props.hour],
     );
     useEffect(() => runtime.current?.setPaused(paused), [paused, ready]);
     useEffect(() => {

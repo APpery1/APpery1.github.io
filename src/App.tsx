@@ -18,13 +18,7 @@ const ContentPanel = lazy(() =>
     default: module.ContentPanel,
   })),
 );
-const readNight = () => {
-  try {
-    return localStorage.getItem("appery-city-night") === "1";
-  } catch {
-    return false;
-  }
-};
+import { clockLabel, periods, useCityClock, type TimeMode } from "./lib/cityClock";
 const alreadyArrived = () => {
   try {
     return sessionStorage.getItem("appery-city-arrived") === "1";
@@ -36,7 +30,7 @@ const alreadyArrived = () => {
 export default function App() {
   const { lang, toggleLang } = useI18n();
   const [route, setRoute] = useState(parseRoute);
-  const [night, setNight] = useState(readNight);
+  const { mode, setMode, hour, night } = useCityClock();
   const [entering, setEntering] = useState<PlaceId | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [portalOrigin, setPortalOrigin] = useState({ x: 0, y: 0 });
@@ -90,11 +84,6 @@ export default function App() {
   }, [raceVeil]);
   useEffect(() => {
     document.documentElement.dataset.theme = night ? "night" : "day";
-    try {
-      localStorage.setItem("appery-city-night", night ? "1" : "0");
-    } catch {
-      /* session preference */
-    }
   }, [night]);
   useEffect(() => {
     if (guideOpen) guideRef.current?.showModal();
@@ -269,21 +258,17 @@ export default function App() {
             <span>{lang === "zh" ? "城市导览" : "City guide"}</span>
           </button>
           <span className="header-divider" />
-          <button
-            className="icon-button theme-toggle"
-            onClick={() => setNight(!night)}
-            aria-label={
-              lang === "zh"
-                ? night
-                  ? "切换到白昼"
-                  : "切换到夜晚"
-                : night
-                  ? "Switch to day"
-                  : "Switch to night"
-            }
-          >
-            <Icon name={night ? "moon" : "sun"} size={19} />
-          </button>
+          <label className="city-time-control">
+            <Icon name={night ? "moon" : "sun"} size={16} />
+            <span aria-hidden="true">{clockLabel(hour)} ▾</span>
+            <select value={mode} onChange={(e) => setMode(e.target.value as TimeMode)}
+              aria-label={lang === "zh" ? "城市时间" : "City time"}>
+              <option value="local">{lang === "zh" ? "跟随本地时间" : "Use local time"}</option>
+              {Object.entries(periods).map(([id, [h, zh, en]]) => (
+                <option key={id} value={id}>{clockLabel(h)} · {lang === "zh" ? zh : en}</option>
+              ))}
+            </select>
+          </label>
           <button
             className="language-button"
             onClick={switchLanguage}
@@ -347,6 +332,7 @@ export default function App() {
                   ref={cityRef}
                   onEnter={enter}
                   night={night}
+                  hour={hour}
                   onToggleLanguage={switchLanguage}
                   onQuietChange={setMapQuiet}
                   onCityReady={() => setCityReady(true)}

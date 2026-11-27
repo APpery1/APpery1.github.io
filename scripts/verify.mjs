@@ -641,16 +641,15 @@ try {
   await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
   await page.locator(".map-reset").click();
   check("点击机场可切回中文", true);
-  await page.locator(".theme-toggle").click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "night");
-  await page.reload({ waitUntil: "networkidle" });
+  await page.locator(".city-time-control select").selectOption("midnight");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "night");
   await screenshot(page, "home-night");
   await audit(page, "夜间首页");
   await go("contact");
   await audit(page, "夜间联系页");
-  await page.locator(".theme-toggle").click();
-  check("日夜切换及偏好刷新后保留", true);
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(page.locator(".city-time-control select")).toHaveValue("local");
+  check("可切换到深夜，刷新时恢复本地时间", true);
 
   for (const width of [320, 390, 768, 1366]) {
     await page.setViewportSize({ width, height: width < 760 ? 844 : 768 });
