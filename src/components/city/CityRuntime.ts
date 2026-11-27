@@ -1,8 +1,12 @@
 import * as THREE from "three";
+import { MeshBVH, acceleratedRaycast, CENTER } from "three-mesh-bvh";
 import { MapControls } from "three/addons/controls/MapControls.js";
 import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { loadCityBytes } from "./CityAsset";
+import { cityFrame } from "../../lib/cityClock";
+type LightSample = { sun: XYZ; energy: number; sky: XYZ; ambient: number; glow: Record<string, number> };
+type Daylight = { hands: Record<"hour" | "minute", string>; emission: Record<string, XYZ>; samples: LightSample[] };
 import {
   landmarks,
   landmarkById,
@@ -61,6 +65,7 @@ type BatchEntry = {
   instance: number;
   source: THREE.Mesh;
   dynamic: boolean;
+  palette: boolean;
 };
 export class CityRuntime {
   renderer: THREE.WebGLRenderer;
@@ -81,9 +86,11 @@ export class CityRuntime {
   private presented = false;
   disposed = false;
   paused = false;
-  night = false;
+  private hour = 6;
+  private daylight?: Daylight;
   private raf = 0;
-  private last = 0;
+  private viewDirty = true;
+  private nextPaint = 0;
   private lastPaint = 0;
   private reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   private dirty = true;
@@ -95,7 +102,11 @@ export class CityRuntime {
   private dragged = false;
   private touchPointers = new Set<number>();
   private staticMaterials = new Set<THREE.MeshStandardMaterial>();
-  private highlight = new THREE.Group();
+  private hoverFrame = 0;
+  private hoverPointer = { x: 0, y: 0 };
+  private hoverId: CityDestination | null = null;
+  private hoverColor = new THREE.Color();
+  private highlightTint = new THREE.Color("#ffdc88");
   private selected: CityDestination | null = null;
   private sun = new THREE.DirectionalLight("#fff6dd", 2.1);
   private sky = new THREE.HemisphereLight("#d7edff", "#b3b58c", 1.2);
@@ -155,6 +166,7 @@ export class CityRuntime {
     this.renderer.domElement.addEventListener("auxclick", this.blockMiddle);
     window.addEventListener("pointerup", this.middleUp);
     window.addEventListener("pointercancel", this.middleUp);
+    this.raycaster.firstHitOnly = true;
     this.sun.position.set(-65, 105, 65);
     this.sun.castShadow = true;
     this.sun.shadow.mapSize.set(2048, 2048);
@@ -175,7 +187,6 @@ export class CityRuntime {
       this.sun.target,
       this.sky,
       this.fill,
-      this.highlight,
     );
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(2000, 2000),
@@ -203,6 +214,7 @@ export class CityRuntime {
     void this.load();
   }
   private changed = () => {
+    this.viewDirty = true;
     this.dirty = true;
     this.options.onView(this.effectiveZoom());
   };
@@ -229,6 +241,7 @@ export class CityRuntime {
     if (!this.width || !this.height) return;
     this.renderer.setSize(this.width, this.height);
     this.applyLens();
+    this.viewDirty = true;
     if (this.mode === "overview") this.overview();
     else this.controls.update();
     this.dirty = true;
@@ -268,7 +281,7 @@ export class CityRuntime {
       if (this.disposed) return;
       this.root = gltf.scene.clone(true);
       this.root.name = "Blender city source";
-      this.scene.add(this.root);
+      // This hierarchy drives animation and picking; only batches enter the render scene.
       const materialCopies = new Map<
         THREE.Material,
         THREE.MeshStandardMaterial
@@ -279,10 +292,15 @@ export class CityRuntime {
         if (!materialCopies.has(mat)) materialCopies.set(mat, mat.clone());
         o.material = materialCopies.get(mat)!;
         this.staticMaterials.add(o.material as THREE.MeshStandardMaterial);
-        o.updateMatrixWorld();
+        if ((o.geometry.index?.count ?? 0) > 1500) {
+          o.geometry.boundsTree ??= new MeshBVH(o.geometry, { strategy: CENTER, targetLeafSize: 24, indirect: true });
+          o.raycast = acceleratedRaycast;
+        }
+        o.geometry.computeBoundingBox();
         this.hits.push(o);
       });
       this.root.updateMatrixWorld(true);
+      this.daylight = gltf.scene.userData.daylight as Daylight;
       this.buildBatches();
       this.root.visible = false;
       this.mixer = new THREE.AnimationMixer(this.root);
@@ -294,10 +312,11 @@ export class CityRuntime {
         this.applyLens();
         this.controls.update();
       }
-      this.applyTheme();
+      this.setHour(this.hour);
+      this.viewDirty = true;
       this.ready = true;
       performance.mark("city-scene-ready");
-      this.host.dataset.modelSource = "blender/city_model.blend";
+      this.host.dataset.modelSource = "blender/city-v2.blend";
       this.host.dataset.animationClips = String(gltf.animations.length);
       this.host.dataset.sourceMeshes = String(this.hits.length);
       this.renderer.shadowMap.needsUpdate = true;
@@ -316,6 +335,7 @@ export class CityRuntime {
       {
         mat: THREE.MeshStandardMaterial;
         dynamic: boolean;
+        palette: boolean;
         meshes: THREE.Mesh[];
       }
     >();
@@ -326,17 +346,36 @@ export class CityRuntime {
         if (node.name.startsWith("motion_")) dynamic = true;
         node = node.parent;
       }
-      const mat = mesh.material as THREE.MeshStandardMaterial,
-        key = mat.uuid + dynamic;
+      const mat = mesh.material as THREE.MeshStandardMaterial;
+      // Plain opaque, untextured PBR surfaces differ only in colour and finish.
+      // Keep glass, lamps and driven windows on their own materials.
+      const palette = mat.type === "MeshStandardMaterial" && !mat.transparent && !mat.map &&
+        !mat.emissive.getHex() && !this.daylight?.emission[mat.name];
+      const key = `${dynamic}:${palette ? `palette-${mat.side}` : mat.uuid}`;
       let bucket = buckets.get(key);
       if (!bucket) {
-        bucket = { mat, dynamic, meshes: [] };
+        const shared = palette ? mat.clone() : mat;
+        if (palette) {
+          shared.color.set(0xffffff);
+          shared.metalness = shared.roughness = 1;
+          shared.onBeforeCompile = (shader) => {
+            shader.vertexShader = `attribute vec2 cityFinish; varying vec2 vFinish;\n` + shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvFinish = cityFinish;");
+            shader.fragmentShader = `varying vec2 vFinish;\n` + shader.fragmentShader.replace("#include <roughnessmap_fragment>", "float roughnessFactor = vFinish.x;").replace("#include <metalnessmap_fragment>", "float metalnessFactor = vFinish.y;");
+          };
+          this.staticMaterials.add(shared);
+        }
+        bucket = { mat: shared, dynamic, palette, meshes: [] };
         buckets.set(key, bucket);
       }
       bucket.meshes.push(mesh);
     }
-    for (const { mat, dynamic, meshes } of buckets.values()) {
-      const geometries = [...new Set(meshes.map((m) => m.geometry))],
+    for (const { mat, dynamic, palette, meshes } of buckets.values()) {
+      const geometryKey = (m: THREE.Mesh) => {
+        const surface = m.material as THREE.MeshStandardMaterial;
+        return `${m.geometry.uuid}:${surface.roughness}:${surface.metalness}`;
+      };
+      const unique = new Map(meshes.map(m => [geometryKey(m), m]));
+      const geometries = [...unique.values()].map(m => m.geometry),
         vertices = geometries.reduce(
           (s, g) => s + g.getAttribute("position").count,
           0,
@@ -357,8 +396,9 @@ export class CityRuntime {
       batch.frustumCulled = false;
       batch.perObjectFrustumCulled = false;
       batch.sortObjects = false;
-      const ids = new Map<THREE.BufferGeometry, number>();
-      for (const source of geometries) {
+      const ids = new Map<string, number>();
+      for (const [key, mesh] of unique) {
+        const source = mesh.geometry;
         const geometry = new THREE.BufferGeometry();
         for (const key of ["position", "normal"]) {
           const a = source.getAttribute(key),
@@ -371,13 +411,22 @@ export class CityRuntime {
           geometry.setAttribute(key, new THREE.BufferAttribute(values, 3));
         }
         if (source.index) geometry.setIndex(source.index.clone());
-        ids.set(source, batch.addGeometry(geometry));
+        if (palette) {
+          const surface = mesh.material as THREE.MeshStandardMaterial;
+          const finish = new Float32Array(source.getAttribute('position').count * 2);
+          for (let i = 0; i < finish.length; i += 2) { finish[i] = surface.roughness; finish[i + 1] = surface.metalness; }
+          geometry.setAttribute('cityFinish', new THREE.BufferAttribute(finish, 2));
+        }
+        ids.set(key, batch.addGeometry(geometry));
         geometry.dispose();
       }
       for (const mesh of meshes) {
-        const instance = batch.addInstance(ids.get(mesh.geometry)!);
+        const instance = batch.addInstance(ids.get(geometryKey(mesh))!);
+        if (palette) batch.setColorAt(instance, (mesh.material as THREE.MeshStandardMaterial).color);
         batch.setMatrixAt(instance, mesh.matrixWorld);
-        this.entries.push({ batch, instance, source: mesh, dynamic });
+        if (dynamic || (palette && landmarkById[mesh.userData.place as CityDestination])) {
+          this.entries.push({ batch, instance, source: mesh, dynamic, palette });
+        }
       }
       this.scene.add(batch);
     }
@@ -387,17 +436,13 @@ export class CityRuntime {
     this.raf = requestAnimationFrame(this.loop);
     const active =
       this.ready && !this.paused && !this.reduced.matches && !document.hidden;
-    const elapsed = this.last ? Math.min((now - this.last) / 1000, 0.15) : 0;
-    this.last = now;
-    if (
-      document.hidden ||
-      (!this.dirty && !active) ||
-      now - this.lastPaint < (this.width < 760 ? 1000 / 24 : 1000 / 30)
-    )
-      return;
-    const dt = this.lastPaint
-      ? Math.min((now - this.lastPaint) / 1000, 0.15)
-      : elapsed;
+    if (document.hidden || (!this.dirty && !active)) return;
+    // Keep cadence across fractional display refresh intervals. Camera input
+    // bypasses the cap, including when traffic is paused.
+    const interval = 1000 / 60;
+    if (!this.dirty && now + 0.75 < this.nextPaint) return;
+    const dt = this.lastPaint ? Math.min((now - this.lastPaint) / 1000, 0.15) : 0;
+    this.nextPaint = (this.nextPaint > now - interval && this.nextPaint <= now + .75 ? this.nextPaint : now) + interval;
     this.lastPaint = now;
     if (active && this.mixer) {
       this.mixer.update(dt);
@@ -414,7 +459,7 @@ export class CityRuntime {
       this.options.onProgress?.(1);
       this.options.onReady();
     }
-    for (const l of landmarks)
+    if (this.viewDirty) for (const l of landmarks)
       this.options.onProject(
         l.id,
         this.project(l.anchor),
@@ -424,6 +469,7 @@ export class CityRuntime {
     this.host.dataset.animationPaused = String(!active);
     this.host.dataset.drawCalls = String(this.renderer.info.render.calls);
     this.host.dataset.triangles = String(this.renderer.info.render.triangles);
+    if (this.viewDirty) {
     this.host.dataset.cameraZoom = this.effectiveZoom().toFixed(2);
     this.host.dataset.cameraTarget = JSON.stringify(
       this.controls.target.toArray().map((n) => Number(n.toFixed(3))),
@@ -432,6 +478,8 @@ export class CityRuntime {
       this.camera.position.toArray().map((n) => Number(n.toFixed(3))),
     );
     this.host.dataset.viewMode = this.mode;
+    this.viewDirty = false;
+    }
     this.dirty = false;
   };
   project(point: XYZ): ScreenPoint {
@@ -537,59 +585,53 @@ export class CityRuntime {
     this.controls.update();
     this.dirty = true;
   }
-  setNight(value: boolean) {
-    this.night = value;
-    this.applyTheme();
-  }
-  private applyTheme() {
-    this.scene.background = new THREE.Color(this.night ? "#172b32" : "#d4dfcc");
-    this.sky.intensity = this.night ? 0.42 : 1.2;
-    this.sun.intensity = this.night ? 0.35 : 2.1;
-    this.sun.color.set(this.night ? "#96bcf2" : "#fff6dd");
-    this.fill.intensity = this.night ? 0.25 : 0.4;
-    this.renderer.toneMappingExposure = this.night ? 0.87 : 0.95;
-    for (const material of this.staticMaterials) {
-      const n = material.name.toLowerCase(),
-        lit = n.includes("glass") || n.includes("lamp");
-      material.emissive.set(
-        lit && this.night
-          ? n.includes("lamp")
-            ? "#edbd70"
-            : "#4c95ad"
-          : "#000000",
-      );
-      material.emissiveIntensity = this.night
-        ? n.includes("lamp")
-          ? 1.2
-          : 0.14
-        : 0;
+  setHour(hour: number) {
+    this.hour = hour;
+    const daylight = this.daylight;
+    if (!daylight || !this.root) return;
+    const frame = cityFrame(hour);
+    this.host.dataset.cityFrame = String(frame);
+    const index = ((frame - 1) / 14399) * (daylight.samples.length - 1);
+    const left = Math.floor(index), f = index - left;
+    const a = daylight.samples[left], b = daylight.samples[Math.min(left + 1, daylight.samples.length - 1)];
+    const mix = (x: number, y: number) => THREE.MathUtils.lerp(x, y, f);
+    const sun = this.sun;
+    sun.position.set(mix(a.sun[0], b.sun[0]), mix(a.sun[1], b.sun[1]), mix(a.sun[2], b.sun[2])).normalize().multiplyScalar(145);
+    sun.intensity = mix(a.energy, b.energy);
+    const altitude = Math.sin((hour - 6) * Math.PI / 12);
+    const twilight = Math.max(0, 1 - Math.abs(altitude) * 3);
+    sun.color.set("#fff6dd").lerp(new THREE.Color(hour < 12 ? "#ffce92" : "#ffa079"), twilight);
+    const ambient = mix(a.ambient, b.ambient);
+    this.scene.background = new THREE.Color(mix(a.sky[0], b.sky[0]), mix(a.sky[1], b.sky[1]), mix(a.sky[2], b.sky[2])).multiplyScalar(ambient);
+    this.sky.intensity = ambient * 2.2;
+    this.fill.intensity = ambient * 0.8;
+    for (const mat of this.staticMaterials) {
+      const color = daylight.emission[mat.name];
+      if (!color) continue;
+      mat.emissive.setRGB(...color);
+      mat.emissiveIntensity = mix(a.glow[mat.name], b.glow[mat.name]);
+    }
+    // Blender Y maps to glTF -Z. These two pivots retain the authored hand geometry.
+    for (const part of ["hour", "minute"] as const) {
+      const hand = this.root.getObjectByName(daylight.hands[part]);
+      if (!hand) continue;
+      hand.rotation.set(0, 0, -hour * Math.PI * (part === "hour" ? 1 / 6 : 2));
+      hand.updateWorldMatrix(true, true);
+      for (const e of this.entries) if (e.source.parent === hand) e.batch.setMatrixAt(e.instance, e.source.matrixWorld);
     }
     this.renderer.shadowMap.needsUpdate = true;
     this.dirty = true;
   }
   select(id: CityDestination | null) {
     if (this.selected === id) return;
+    const previous = this.selected;
     this.selected = id;
-    for (const c of [...this.highlight.children]) {
-      this.highlight.remove(c);
-      const line = c as THREE.LineSegments;
-      line.geometry.dispose();
-      (line.material as THREE.Material).dispose();
-    }
-    if (id) {
-      for (const mesh of this.hits.filter((m) => m.userData.place === id)) {
-        const line = new THREE.LineSegments(
-          new THREE.EdgesGeometry(mesh.geometry, 40),
-          new THREE.LineBasicMaterial({
-            color: this.night ? "#ffe1a0" : "#fdf1ad",
-            transparent: true,
-            opacity: 0.75,
-            depthTest: true,
-          }),
-        );
-        line.applyMatrix4(mesh.matrixWorld);
-        this.highlight.add(line);
-      }
+    for (const { palette, source, instance, batch } of this.entries) {
+      const place = source.userData.place;
+      if (!palette || (place !== previous && place !== id)) continue;
+      this.hoverColor.copy((source.material as THREE.MeshStandardMaterial).color);
+      if (place === id) this.hoverColor.lerp(this.highlightTint, 0.32);
+      batch.setColorAt(instance, this.hoverColor);
     }
     this.dirty = true;
   }
@@ -607,6 +649,7 @@ export class CityRuntime {
     return landmarkById[id] ? id : null;
   }
   private down = (event: PointerEvent) => {
+    this.leave();
     if (event.pointerType === "touch") {
       this.touchPointers.add(event.pointerId);
       if (this.touchPointers.size > 1) {
@@ -624,9 +667,17 @@ export class CityRuntime {
     )
       this.dragged = true;
     if (!event.buttons && event.pointerType !== "touch") {
-      const id = this.pick(event.clientX, event.clientY);
-      this.renderer.domElement.style.cursor = id ? "pointer" : "grab";
-      this.options.onHover(id);
+      this.hoverPointer.x = event.clientX;
+      this.hoverPointer.y = event.clientY;
+      if (!this.hoverFrame) this.hoverFrame = requestAnimationFrame(() => {
+        this.hoverFrame = 0;
+        const id = this.pick(this.hoverPointer.x, this.hoverPointer.y);
+        if (id !== this.hoverId) {
+          this.hoverId = id;
+          this.renderer.domElement.style.cursor = id ? "pointer" : "grab";
+          this.options.onHover(id);
+        }
+      });
     }
   };
   private up = (event: PointerEvent) => {
@@ -643,7 +694,15 @@ export class CityRuntime {
     this.touchPointers.delete(event.pointerId);
     this.dragged = true;
   };
-  private leave = () => this.options.onHover(null);
+  private leave = () => {
+    cancelAnimationFrame(this.hoverFrame);
+    this.hoverFrame = 0;
+    if (this.hoverId !== null) {
+      this.hoverId = null;
+      this.renderer.domElement.style.cursor = "grab";
+      this.options.onHover(null);
+    }
+  };
   setPaused(value: boolean) {
     this.paused = value;
     this.dirty = true;
@@ -671,6 +730,7 @@ export class CityRuntime {
     if (this.ready) saved = this.snapshot();
     this.disposed = true;
     cancelAnimationFrame(this.raf);
+    cancelAnimationFrame(this.hoverFrame);
     this.resizeObserver.disconnect();
     this.controls.dispose();
     this.renderer.domElement.removeEventListener(

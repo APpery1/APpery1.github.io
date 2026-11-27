@@ -113,7 +113,7 @@ try {
   await page.locator(".map-reset").click();
   check("左键拖动切换罗盘十字，中键旋转切换弧形箭头，地图平移旋转缩放保持正常");
 
-  await page.locator(".theme-toggle").click();
+  await page.locator(".city-time-control select").selectOption("midnight");
   await guide.hover();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "night");
   expect(
@@ -135,7 +135,7 @@ try {
     forcedColors: "none",
     reducedMotion: "no-preference",
   });
-  await page.locator(".theme-toggle").click();
+  await page.locator(".city-time-control select").selectOption("noon");
   check("夜间指针配色自适应，减少动态停用过渡，高对比模式恢复系统指针");
 
   await page.goto(`${origin}/#docs`, { waitUntil: "domcontentloaded" });

@@ -3,8 +3,8 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { NodeIO, Accessor } from "@gltf-transform/core";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
-import { dedup, prune, resample, meshopt } from "@gltf-transform/functions";
-import { MeshoptEncoder } from "meshoptimizer";
+import { dedup, prune, resample, meshopt, simplifyPrimitive, weld } from "@gltf-transform/functions";
+import { MeshoptEncoder, MeshoptSimplifier } from "meshoptimizer";
 const root = process.cwd(),
   dir = path.join(root, "evidence/model-export");
 const metadata = JSON.parse(
@@ -26,12 +26,14 @@ const time = doc
   .setType(Accessor.Type.SCALAR)
   .setArray(
     Float32Array.from(
-      { length: metadata.fps * metadata.duration + 1 },
+      { length: metadata.fps * metadata.motionDuration + 1 },
       (_, i) => i / metadata.fps,
     ),
   )
   .setBuffer(buffer);
-const clip = doc.createAnimation("City life · 32 seconds");
+const scene = doc.getRoot().getDefaultScene();
+scene.setExtras({ ...scene.getExtras(), daylight: metadata.daylight });
+const clip = doc.createAnimation("Street traffic");
 for (const track of metadata.animations) {
   const node = nodes.get(track.node);
   if (!node) throw new Error(`Missing animation node ${track.node}`);
@@ -58,8 +60,19 @@ for (const track of metadata.animations) {
       );
   }
 }
+// Dense bevels and lettering dominate this model. Limit geometric error and
+// leave small primitives (including clock hands) and animation tracks alone.
+await MeshoptSimplifier.ready;
+await doc.transform(weld());
+for (const mesh of doc.getRoot().listMeshes()) {
+  for (const prim of mesh.listPrimitives()) {
+    if ((prim.getIndices()?.getCount() ?? 0) > 9000) {
+      simplifyPrimitive(prim, { simplifier: MeshoptSimplifier, ratio: 0.28, error: 0.0004 });
+    }
+  }
+}
 await doc.transform(
-  dedup(),
+  dedup({ keepUniqueNames: true }),
   resample({ tolerance: 0.00001 }),
   prune(),
   meshopt({ encoder: MeshoptEncoder, level: "high", quantizePosition: 16 }),
@@ -69,6 +82,7 @@ await io.write("public/models/city.glb", doc);
 const manifest = {
   ...metadata,
   animations: undefined,
+  daylight: undefined,
   modelBytes: fs.statSync("public/models/city.glb").size,
   modelSha256: crypto
     .createHash("sha256")

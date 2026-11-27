@@ -48,10 +48,10 @@ try {
   await page.waitForTimeout(200);
   await page.screenshot({ path: "evidence/blender-draft-hints.png" });
   await page.locator(".map-hints").click();
-  await page.locator(".theme-toggle").click();
+  await page.locator(".city-time-control select").selectOption("midnight");
   await page.waitForTimeout(200);
   await page.screenshot({ path: "evidence/blender-draft-night.png" });
-  await page.locator(".theme-toggle").click();
+  await page.locator(".city-time-control select").selectOption("noon");
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator(".map-reset").click();
   await page.waitForTimeout(200);
